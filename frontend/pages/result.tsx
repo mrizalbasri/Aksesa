@@ -6,9 +6,33 @@ import RecommendationCard from "@/components/scoring/RecommendationCard";
 import ScoreHistory from "@/components/scoring/ScoreHistory";
 import { Button } from "@/components/ui/button";
 import { Download, Share2 } from "lucide-react";
+import { generatePdfReport } from "@/lib/pdfGenerator";
 
 const ResultPage = () => {
   const score = 75; // Mock score
+
+  // Mock data for the PDF report
+  const reportData = {
+    score: score,
+    positiveFactors: [
+      "Pembayaran tagihan selalu tepat waktu.",
+      "Memiliki riwayat kredit yang panjang dan baik.",
+      "Tingkat utilisasi kredit rendah.",
+    ],
+    negativeFactors: [
+      "Baru-baru ini mengajukan beberapa pinjaman baru.",
+      "Memiliki satu catatan keterlambatan pembayaran di masa lalu.",
+    ],
+    recommendations: [
+      "Hindari mengajukan terlalu banyak kredit dalam waktu singkat.",
+      "Terus pertahankan kebiasaan pembayaran yang baik.",
+      "Pertimbangkan untuk diversifikasi jenis kredit Anda.",
+    ],
+  };
+
+  const handleDownloadPdf = () => {
+    generatePdfReport(reportData);
+  };
 
   return (
     <div className="min-h-screen bg-slate-950 py-12 text-slate-50">
@@ -31,7 +55,10 @@ const ResultPage = () => {
                     <Share2 className="mr-2 size-4" />
                     Bagikan
                   </Button>
-                  <Button className="bg-blue-600 text-white hover:bg-blue-700">
+                  <Button
+                    className="bg-blue-600 text-white hover:bg-blue-700"
+                    onClick={handleDownloadPdf}
+                  >
                     <Download className="mr-2 size-4" />
                     Download Laporan PDF
                   </Button>

@@ -1,10 +1,15 @@
-import React from 'react'
-import '../styles/globals.css'
+import React from "react";
+import "../styles/globals.css";
+import type { AppProps } from "next/app";
+import Navbar from "@/components/Navbar";
 
-export default function App({ Component, pageProps }: any) {
+function MyApp({ Component, pageProps }: AppProps) {
   return (
-    <div className="min-h-screen bg-gray-50">
+    <>
+      <Navbar />
       <Component {...pageProps} />
-    </div>
-  )
+    </>
+  );
 }
+
+export default MyApp;

@@ -4,6 +4,7 @@ import ScoreGauge from "@/components/scoring/ScoreGauge";
 import FactorBreakdown from "@/components/scoring/FactorBreakdown";
 import RecommendationCard from "@/components/scoring/RecommendationCard";
 import ScoreHistory from "@/components/scoring/ScoreHistory";
+import LoanSimulator from "@/components/scoring/LoanSimulator";
 import { Button } from "@/components/ui/button";
 import { Download, Share2 } from "lucide-react";
 import { generatePdfReport } from "@/lib/pdfGenerator";
@@ -72,7 +73,10 @@ const ResultPage = () => {
             <RecommendationCard />
           </div>
 
-          <ScoreHistory />
+          <div className="grid grid-cols-1 gap-8 lg:grid-cols-2">
+            <ScoreHistory />
+            <LoanSimulator />
+          </div>
         </div>
       </div>
     </div>

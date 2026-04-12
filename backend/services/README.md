@@ -1,4 +1,4 @@
-# SmartScore UMKM - Backend Services
+# Aksesa - Backend Services
 
 ## Azure Integration Modules
 

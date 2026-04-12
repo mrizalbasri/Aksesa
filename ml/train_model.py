@@ -1,4 +1,4 @@
-# SmartScore UMKM - ML Training Notebook
+# Aksesa - ML Training Notebook
 # This module contains model training and evaluation
 
 import pandas as pd

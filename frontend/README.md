@@ -1,4 +1,4 @@
-# 🏦 SmartScore UMKM(Aksesa)
+# 🏦 Aksesa
 ### AI-Powered Alternative Credit Scoring for Indonesian SMEs
 
 > Submission for **AI Impact Challenge** — Microsoft Elevate Training Center x Dicoding x Komdigi  
@@ -8,13 +8,13 @@
 
 ## 📌 Latar Belakang
 
-UMKM menyumbang lebih dari 60% PDB Indonesia, namun lebih dari 70% pelaku UMKM kesulitan mengakses pembiayaan formal karena tidak memiliki laporan keuangan resmi. **SmartScore UMKM** hadir sebagai solusi credit scoring alternatif berbasis AI yang menggunakan data non-formal untuk menilai kelayakan kredit pelaku UMKM.
+UMKM menyumbang lebih dari 60% PDB Indonesia, namun lebih dari 70% pelaku UMKM kesulitan mengakses pembiayaan formal karena tidak memiliki laporan keuangan resmi. **Aksesa** hadir sebagai solusi credit scoring alternatif berbasis AI yang menggunakan data non-formal untuk menilai kelayakan kredit pelaku UMKM.
 
 ---
 
 ## 💡 Solusi
 
-SmartScore UMKM adalah platform web berbasis AI yang memungkinkan pelaku UMKM mendapatkan skor kredit berdasarkan **data alternatif** seperti:
+Aksesa adalah platform web berbasis AI yang memungkinkan pelaku UMKM mendapatkan skor kredit berdasarkan **data alternatif** seperti:
 
 - Foto nota / invoice penjualan
 - Riwayat transaksi harian sederhana
@@ -115,8 +115,8 @@ Azure App Service (Hosting)
 ### Backend
 ```bash
 # Clone repository
-git clone https://github.com/username/smartscore-umkm.git
-cd smartscore-umkm/backend
+git clone https://github.com/username/aksesa.git
+cd aksesa/backend
 
 # Install dependencies
 pip install -r requirements.txt
@@ -145,7 +145,7 @@ npm run dev
 ## 📁 Struktur Folder
 
 ```
-smartscore-umkm/
+aksesa/
 ├── backend/
 │   ├── main.py                 # FastAPI entry point
 │   ├── routes/
@@ -212,4 +212,4 @@ MIT License — bebas digunakan untuk keperluan edukasi dan pengembangan lebih l
 
 ---
 
-> 💬 *"Setiap UMKM berhak mendapat akses modal yang adil. SmartScore UMKM hadir untuk mewujudkannya."*
+> 💬 *"Setiap UMKM berhak mendapat akses modal yang adil. Aksesa hadir untuk mewujudkannya."*

@@ -50,7 +50,7 @@ const LandingPage = () => {
       <section id="fitur" className="mx-auto max-w-6xl px-4 py-16 sm:px-6 lg:px-8">
         <div className="mx-auto max-w-lg text-center">
           <h2 className="text-3xl font-bold text-white sm:text-4xl">
-            Fitur Utama SmartScore UMKM
+            Fitur Utama Aksesa
           </h2>
           <p className="mt-4 text-slate-300">
             Dirancang untuk memberdayakan UMKM Indonesia dengan teknologi

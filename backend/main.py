@@ -1,5 +1,5 @@
 """
-SmartScore UMKM - FastAPI Backend
+Aksesa - FastAPI Backend
 AI-Powered Credit Scoring for Indonesian SMEs
 """
 
@@ -14,7 +14,7 @@ load_dotenv()
 
 # Initialize FastAPI app
 app = FastAPI(
-    title="SmartScore UMKM API",
+    title="Aksesa API",
     description="AI-powered credit scoring for Indonesian SMEs",
     version="1.0.0"
 )
@@ -35,7 +35,7 @@ async def health_check():
     """API health check endpoint"""
     return {
         "status": "healthy",
-        "service": "SmartScore UMKM API",
+        "service": "Aksesa API",
         "version": "1.0.0"
     }
 
@@ -44,7 +44,7 @@ async def health_check():
 async def root():
     """API root endpoint"""
     return {
-        "message": "Welcome to SmartScore UMKM API",
+        "message": "Welcome to Aksesa API",
         "docs": "/docs",
         "redoc": "/redoc"
     }

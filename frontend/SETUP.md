@@ -1,8 +1,8 @@
 # Project Root Configuration
 
-## About SmartScore UMKM
+## About Aksesa
 
-SmartScore UMKM adalah platform credit scoring berbasis AI untuk UMKM Indonesia yang tidak memiliki laporan keuangan formal.
+Aksesa adalah platform credit scoring berbasis AI untuk UMKM Indonesia yang tidak memiliki laporan keuangan formal.
 
 ## Project Structure
 

@@ -8,7 +8,7 @@ const Navbar = () => {
     <header className="sticky top-0 z-50 w-full border-b border-slate-800 bg-slate-950/80 backdrop-blur-sm">
       <div className="mx-auto flex h-14 max-w-6xl items-center justify-between px-4 sm:px-6 lg:px-8">
         <Link href="/" className="text-lg font-bold text-white">
-          SmartScore
+          Aksesa
         </Link>
         <nav className="flex items-center gap-4">
           <Link

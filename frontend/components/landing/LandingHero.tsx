@@ -15,7 +15,7 @@ const LandingHero = () => {
             Platform Credit Scoring UMKM
           </p>
           <h1 className="mt-6 bg-gradient-to-r from-blue-200 via-blue-400 to-cyan-300 bg-clip-text text-3xl font-extrabold text-transparent sm:text-5xl">
-            SmartScore UMKM
+            Aksesa
             <span className="mt-2 block text-slate-100">
               Akses pembiayaan lebih adil untuk pelaku usaha Indonesia.
             </span>

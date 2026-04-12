@@ -1,5 +1,5 @@
 # 🎯 PHASE-BASED DEVELOPMENT PLAN FORMAT
-## SmartScore UMKM - Task Breakdown for AI Agents
+## Aksesa - Task Breakdown for AI Agents
 
 ---
 

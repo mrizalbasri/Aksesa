@@ -23,7 +23,7 @@ const ScoringFormContext = createContext<ScoringFormContextValue | null>(null);
 
 export function ScoringFormProvider({ children }: { children: ReactNode }) {
   const form = useForm<ScoringFormValues>({
-    resolver: zodResolver(scoringFormSchema),
+    resolver: zodResolver(scoringFormSchema) as any,
     defaultValues: {
       file: undefined,
       transactions: [{ date: "", amount: 0 }],

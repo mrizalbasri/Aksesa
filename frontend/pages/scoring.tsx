@@ -17,7 +17,7 @@ const ScoringPageContent = () => {
   const totalSteps = 4;
 
   const methods = useForm<ScoringFormValues>({
-    resolver: zodResolver(scoringFormSchema),
+    resolver: zodResolver(scoringFormSchema) as any,
     defaultValues: {
       file: undefined,
       transactions: [{ date: "", amount: 0 }],

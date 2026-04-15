@@ -11,17 +11,17 @@ const BusinessProfileForm = () => {
 
   return (
     <div className="space-y-4">
-      <h3 className="text-lg font-medium text-white">
+      <h3 className="text-lg font-medium text-[#111111]">
         Langkah 4: Profil Bisnis
       </h3>
-      <p className="text-sm text-slate-300">
+      <p className="text-sm text-[#626260]">
         Lengkapi informasi dasar mengenai bisnis Anda.
       </p>
       <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
         <div>
           <label
             htmlFor="business-age"
-            className="text-sm font-medium text-slate-300"
+            className="text-sm font-medium text-[#626260]"
           >
             Lama Usaha (Bulan)
           </label>
@@ -41,7 +41,7 @@ const BusinessProfileForm = () => {
         <div>
           <label
             htmlFor="employees"
-            className="text-sm font-medium text-slate-300"
+            className="text-sm font-medium text-[#626260]"
           >
             Jumlah Karyawan
           </label>
@@ -61,7 +61,7 @@ const BusinessProfileForm = () => {
         <div className="md:col-span-2">
           <label
             htmlFor="location"
-            className="text-sm font-medium text-slate-300"
+            className="text-sm font-medium text-[#626260]"
           >
             Lokasi Usaha (Kota)
           </label>

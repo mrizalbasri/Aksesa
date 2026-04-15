@@ -31,13 +31,13 @@ const getBadgeVariant = (status: string) => {
 const ScoreHistory = () => {
   return (
     <div>
-      <h3 className="mb-4 text-lg font-semibold text-white">Riwayat Skor</h3>
+      <h3 className="mb-4 text-lg font-semibold text-[#111111]">Riwayat Skor</h3>
       <Table>
         <TableHeader>
           <TableRow>
-            <TableHead className="text-white">Tanggal</TableHead>
-            <TableHead className="text-white">Skor</TableHead>
-            <TableHead className="text-right text-white">Status</TableHead>
+            <TableHead>Tanggal</TableHead>
+            <TableHead>Skor</TableHead>
+            <TableHead className="text-right">Status</TableHead>
           </TableRow>
         </TableHeader>
         <TableBody>

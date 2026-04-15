@@ -36,28 +36,28 @@ const ResultPage = () => {
   };
 
   return (
-    <div className="min-h-screen bg-slate-950 py-12 text-slate-50">
+    <div className="min-h-screen bg-[#faf9f6] py-12 text-[#111111]">
       <div className="mx-auto max-w-4xl px-4 sm:px-6 lg:px-8">
         <div className="space-y-8">
-          <Card className="border-slate-800 bg-slate-900/70 shadow-lg shadow-black/10">
+          <Card className="border-[#dedbd6] bg-white">
             <CardHeader>
-              <CardTitle className="text-center text-2xl font-bold text-white">
+              <CardTitle className="text-center text-2xl font-semibold text-[#111111]">
                 Hasil Analisis Skor Kredit Anda
               </CardTitle>
             </CardHeader>
             <CardContent>
-              <div className="flex flex-col items-center justify-center rounded-lg bg-slate-800/50 p-6">
+              <div className="flex flex-col items-center justify-center rounded-lg border border-[#dedbd6] bg-[#fffaf6] p-6">
                 <ScoreGauge score={score} />
                 <div className="mt-4 flex gap-2">
                   <Button
                     variant="outline"
-                    className="border-slate-500 text-slate-100 hover:bg-slate-800"
+                    className="border-[#111111] text-[#111111] hover:bg-[#111111] hover:text-white"
                   >
                     <Share2 className="mr-2 size-4" />
                     Bagikan
                   </Button>
                   <Button
-                    className="bg-blue-600 text-white hover:bg-blue-700"
+                    className="bg-[#ff5600] text-white hover:bg-[#e14b00]"
                     onClick={handleDownloadPdf}
                   >
                     <Download className="mr-2 size-4" />

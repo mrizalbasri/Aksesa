@@ -11,9 +11,9 @@ const mockFactors = [
 
 const FactorBreakdown = () => {
   return (
-    <Card className="border-slate-800 bg-slate-900">
+    <Card className="border-[#dedbd6] bg-white">
       <CardHeader>
-        <CardTitle className="text-lg text-white">
+        <CardTitle className="text-lg text-[#111111]">
           Faktor Penentu Skor
         </CardTitle>
       </CardHeader>
@@ -27,20 +27,20 @@ const FactorBreakdown = () => {
                 ) : (
                   <XCircle className="mr-2 size-5 text-red-500" />
                 )}
-                <span className="text-sm text-slate-300">{factor.name}</span>
+                <span className="text-sm text-[#313130]">{factor.name}</span>
               </div>
               <div className="flex items-center">
                 <span
                   className={`text-sm font-semibold ${
-                    factor.positive ? "text-green-400" : "text-red-400"
+                    factor.positive ? "text-[#2c6415]" : "text-[#c41c1c]"
                   }`}
                 >
                   {factor.positive ? "Positif" : "Negatif"}
                 </span>
                 {factor.positive ? (
-                  <TrendingUp className="ml-2 size-4 text-green-400" />
+                  <TrendingUp className="ml-2 size-4 text-[#2c6415]" />
                 ) : (
-                  <TrendingDown className="ml-2 size-4 text-red-400" />
+                  <TrendingDown className="ml-2 size-4 text-[#c41c1c]" />
                 )}
               </div>
             </li>

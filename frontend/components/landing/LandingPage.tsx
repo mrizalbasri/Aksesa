@@ -46,20 +46,20 @@ const LandingPage = () => {
   ];
 
   return (
-    <main className="min-h-screen bg-[#F9F8F6] text-slate-900 font-sans selection:bg-red-200">
+    <main className="min-h-screen bg-[#faf9f6] font-sans text-[#111111] selection:bg-[#ffd8c2]">
       <LandingHero />
-      
-      <section id="fitur" className="mx-auto max-w-6xl px-4 py-20 sm:px-6 lg:px-8 border-t-2 border-slate-900">
+
+      <section id="fitur" className="mx-auto max-w-6xl border-t border-[#dedbd6] px-4 py-20 sm:px-6 lg:px-8">
         <div className="flex flex-col md:flex-row justify-between items-start md:items-end mb-16 gap-6">
           <div className="max-w-xl">
-            <h2 className="text-sm font-bold uppercase tracking-widest text-slate-500 mb-3 border-b-2 border-slate-900 inline-block pb-1">
+            <h2 className="mb-3 inline-block border-b border-[#dedbd6] pb-1 text-sm font-medium uppercase tracking-[0.1em] text-[#7b7b78]">
               Kapabilitas Sistem
             </h2>
-            <h3 className="text-4xl md:text-5xl font-serif text-slate-900 leading-tight">
-              Infrastruktur untuk <i>Inklusi Finansial</i>.
+            <h3 className="text-4xl leading-tight text-[#111111] md:text-5xl">
+              Infrastruktur untuk <span className="text-[#ff5600]">Inklusi Finansial</span>.
             </h3>
           </div>
-          <p className="max-w-xs text-sm text-slate-600 font-medium border-l-2 border-red-700 pl-4">
+          <p className="max-w-xs border-l-2 border-[#ff5600] pl-4 text-sm text-[#626260]">
             Didesain tanpa kosmetik berlebih. Setiap fitur adalah fungsi faktual yang menjembatani UMKM dengan kepercayaan institusi.
           </p>
         </div>

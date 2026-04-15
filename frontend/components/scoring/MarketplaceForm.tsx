@@ -8,10 +8,10 @@ const MarketplaceForm = () => {
 
   return (
     <div className="space-y-4">
-      <h3 className="text-lg font-medium text-white">
+      <h3 className="text-lg font-medium text-[#111111]">
         Langkah 3: Data Marketplace (Opsional)
       </h3>
-      <p className="text-sm text-slate-300">
+      <p className="text-sm text-[#626260]">
         Jika Anda berjualan di marketplace, masukkan total penjualan bulanan
         Anda.
       </p>
@@ -19,7 +19,7 @@ const MarketplaceForm = () => {
         <div>
           <label
             htmlFor="tokopedia"
-            className="text-sm font-medium text-slate-300"
+            className="text-sm font-medium text-[#626260]"
           >
             Penjualan Tokopedia (Bulan Terakhir)
           </label>
@@ -34,7 +34,7 @@ const MarketplaceForm = () => {
         <div>
           <label
             htmlFor="shopee"
-            className="text-sm font-medium text-slate-300"
+            className="text-sm font-medium text-[#626260]"
           >
             Penjualan Shopee (Bulan Terakhir)
           </label>

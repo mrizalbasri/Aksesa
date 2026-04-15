@@ -4,17 +4,24 @@
 @tailwind utilities;
 
 :root {
-  --primary: #2563eb;
-  --primary-light: #3b82f6;
-  --primary-dark: #1d4ed8;
-  --success: #10b981;
+  --primary: #ff5600;
+  --primary-light: #ff6e2a;
+  --primary-dark: #e14b00;
+  --success: #2c6415;
   --warning: #f59e0b;
-  --danger: #ef4444;
-  --secondary: #6b7280;
+  --danger: #c41c1c;
+  --secondary: #7b7b78;
+  --surface: #faf9f6;
+  --surface-elevated: #ffffff;
+  --text-primary: #111111;
+  --text-secondary: #626260;
+  --border-soft: #dedbd6;
 }
 
 body {
-  @apply bg-gray-50 text-gray-900;
+  background-color: var(--surface);
+  color: var(--text-primary);
+  @apply font-sans;
 }
 
 .container {
@@ -22,23 +29,43 @@ body {
 }
 
 .btn {
-  @apply px-4 py-2 rounded-lg font-medium transition-colors;
+  @apply px-4 py-2 rounded font-medium transition-colors;
 }
 
 .btn-primary {
-  @apply bg-blue-600 text-white hover:bg-blue-700;
+  background-color: var(--primary);
+  color: #ffffff;
+}
+
+.btn-primary:hover {
+  background-color: var(--primary-dark);
 }
 
 .btn-secondary {
-  @apply bg-gray-200 text-gray-900 hover:bg-gray-300;
+  background-color: var(--surface-elevated);
+  color: var(--text-primary);
+  border: 1px solid var(--border-soft);
+}
+
+.btn-secondary:hover {
+  background-color: #f3f1ec;
 }
 
 .card {
-  @apply bg-white rounded-lg shadow-md p-6;
+  background-color: var(--surface-elevated);
+  border: 1px solid var(--border-soft);
+  @apply rounded-lg p-6;
 }
 
 .form-input {
-  @apply w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500;
+  @apply w-full px-4 py-2 rounded-lg focus:outline-none focus:ring-2;
+  border: 1px solid var(--border-soft);
+  background-color: var(--surface-elevated);
+}
+
+.form-input:focus {
+  border-color: var(--primary);
+  --tw-ring-color: rgba(255, 86, 0, 0.25);
 }
 
 @layer base {

@@ -46,12 +46,12 @@ const ScoreGauge: React.FC<ScoreGaugeProps> = ({ score }) => {
             stroke="none"
           >
             <Cell fill={color} />
-            <Cell fill="#374151" />
+            <Cell fill="#dedbd6" />
           </Pie>
         </PieChart>
       </ResponsiveContainer>
       <div className="absolute top-1/2 -translate-y-1/4 text-center">
-        <p className="text-4xl font-bold text-white">{score}</p>
+        <p className="text-4xl font-bold text-[#111111]">{score}</p>
         <p className="text-sm font-medium" style={{ color }}>
           {riskCategory}
         </p>

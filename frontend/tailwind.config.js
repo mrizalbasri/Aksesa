@@ -6,11 +6,14 @@ module.exports = {
   theme: {
     extend: {
       colors: {
-        primary: '#2563eb',
-        secondary: '#6b7280',
-        success: '#10b981',
+        primary: '#ff5600',
+        secondary: '#7b7b78',
+        success: '#2c6415',
         warning: '#f59e0b',
-        danger: '#ef4444',
+        danger: '#c41c1c',
+        cream: '#faf9f6',
+        'off-black': '#111111',
+        oat: '#dedbd6',
       },
       spacing: {
         '128': '32rem',

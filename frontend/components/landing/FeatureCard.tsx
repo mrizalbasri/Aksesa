@@ -13,19 +13,18 @@ const FeatureCard: React.FC<FeatureCardProps> = ({
   icon: Icon,
 }) => {
   return (
-    <article className="group relative flex flex-col border-2 border-slate-900 bg-white p-6 transition-all hover:bg-slate-900 hover:text-white hover:-translate-y-1 hover:shadow-[6px_6px_0px_0px_rgba(194,65,12,1)]">
-      <div className="mb-8 p-3 inline-flex w-fit border-2 border-slate-900 bg-[#F9F8F6] text-slate-900 transition-colors group-hover:border-white group-hover:bg-slate-800 group-hover:text-white">
+    <article className="group relative flex flex-col rounded-lg border border-[#dedbd6] bg-white p-6 transition-colors hover:border-[#ff5600]">
+      <div className="mb-8 inline-flex w-fit rounded border border-[#dedbd6] bg-[#faf9f6] p-3 text-[#111111] transition-colors group-hover:border-[#ff5600] group-hover:bg-[#fff4ee]">
         <Icon className="size-6 stroke-[1.5]" />
       </div>
 
-      <h3 className="mb-3 text-xl font-serif font-bold leading-tight">{title}</h3>
+      <h3 className="mb-3 text-xl font-semibold leading-tight text-[#111111]">{title}</h3>
 
-      <p className="text-sm font-medium leading-relaxed text-slate-600 transition-colors group-hover:text-slate-300">
+      <p className="text-sm leading-relaxed text-[#626260]">
         {description}
       </p>
-      
-      {/* Decorative dot */}
-      <div className="absolute bottom-4 right-4 h-2 w-2 rounded-full bg-slate-300 group-hover:bg-[#C2410C]"></div>
+
+      <div className="absolute bottom-4 right-4 h-2 w-2 rounded-full bg-[#d3cec6] group-hover:bg-[#ff5600]"></div>
     </article>
   );
 };

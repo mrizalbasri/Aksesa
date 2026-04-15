@@ -16,6 +16,11 @@
       "sourceType": "github",
       "computedHash": "f227549d3897086d821b0269a21cae919b5fecc28fa31e60cd95c782d9cfb278"
     },
+    "sleek-design-mobile-apps": {
+      "source": "sleekdotdesign/agent-skills",
+      "sourceType": "github",
+      "computedHash": "0d992cd879dab83e8c91127858035dbd233bdb7851e5030975f37c9c41448d73"
+    },
     "tailwind-design-system": {
       "source": "wshobson/agents",
       "sourceType": "github",

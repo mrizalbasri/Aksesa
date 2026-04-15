@@ -19,10 +19,10 @@ const TransactionForm = () => {
 
   return (
     <div className="space-y-4">
-      <h3 className="text-lg font-medium text-white">
+      <h3 className="text-lg font-medium text-[#111111]">
         Langkah 2: Input Transaksi Harian
       </h3>
-      <p className="text-sm text-slate-300">
+      <p className="text-sm text-[#626260]">
         Masukkan data transaksi harian Anda selama 7 hari terakhir.
       </p>
       <div className="space-y-3">
@@ -73,7 +73,7 @@ const TransactionForm = () => {
         type="button"
         variant="outline"
         onClick={() => append({ date: "", amount: 0 })}
-        className="border-slate-500 text-slate-100 hover:bg-slate-800"
+        className="border-[#111111] text-[#111111] hover:bg-[#111111] hover:text-white"
       >
         <PlusCircle className="mr-2 size-4" />
         Tambah Transaksi

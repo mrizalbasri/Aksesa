@@ -24,6 +24,9 @@ const Footer = () => {
             <Link href="/" className="border-b border-transparent pb-1 transition-colors hover:border-[#ff5600] hover:text-[#111111]">
               Dokumentasi
             </Link>
+            <Link href="/#keamanan-data" className="border-b border-transparent pb-1 transition-colors hover:border-[#ff5600] hover:text-[#111111]">
+              Keamanan Data
+            </Link>
             <Link href="/scoring" className="border-b border-transparent pb-1 transition-colors hover:border-[#ff5600] hover:text-[#111111]">
               Panel Uji
             </Link>

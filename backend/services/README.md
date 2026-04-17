@@ -24,5 +24,6 @@ Module untuk integrasi Azure Document Intelligence
 - [ ] Implement azure_openai.py
 - [ ] Implement azure_ml.py
 - [ ] Implement azure_docintel.py
-- [ ] Database models
-- [ ] Authentication service
+- [ ] Database models (SQLAlchemy + migration)
+- [x] Authentication service (JWT demo user)
+- [x] Result persistence service (in-memory MVP)

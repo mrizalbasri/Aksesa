@@ -8,7 +8,16 @@ const mockRecommendations = [
   "Pertimbangkan untuk mengurangi utang jangka pendek.",
 ];
 
-const RecommendationCard = () => {
+interface RecommendationCardProps {
+  recommendations?: string[];
+}
+
+const RecommendationCard = ({ recommendations }: RecommendationCardProps) => {
+  const recommendationItems =
+    recommendations && recommendations.length > 0
+      ? recommendations
+      : mockRecommendations;
+
   return (
     <Card className="border-[#dedbd6] bg-white">
       <CardHeader>
@@ -19,8 +28,8 @@ const RecommendationCard = () => {
       </CardHeader>
       <CardContent>
         <ul className="list-disc space-y-2 pl-5 text-sm text-[#313130]">
-          {mockRecommendations.map((rec, index) => (
-            <li key={index}>{rec}</li>
+          {recommendationItems.map((rec, index) => (
+            <li key={`${rec}-${index}`}>{rec}</li>
           ))}
         </ul>
       </CardContent>

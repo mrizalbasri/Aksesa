@@ -1,4 +1,4 @@
-import React, { useState, type FormEvent } from "react";
+import React, { useEffect, useMemo, useState, type FormEvent } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import ScoreGauge from "@/components/scoring/ScoreGauge";
 import FactorBreakdown from "@/components/scoring/FactorBreakdown";
@@ -18,6 +18,16 @@ import {
   Loader2,
 } from "lucide-react";
 import { generatePdfReport } from "@/lib/pdfGenerator";
+import {
+  ApiError,
+  SESSION_AUTH_TOKEN_KEY,
+  SESSION_SCORING_RESULT_KEY,
+  createResult,
+  exportResultPdf,
+  getMe,
+  login,
+  shareResult,
+} from "@/lib/api";
 
 type ProtectedAction = "save" | "download" | "share";
 
@@ -27,9 +37,62 @@ const actionLabels: Record<ProtectedAction, string> = {
   share: "Bagikan Hasil",
 };
 
+type StoredScoringResult = {
+  score: number;
+  risk_category: string;
+  factors: string[];
+  recommendations: string[];
+  submitted_at: string;
+  invoice_file_name: string;
+};
+
+const parseStoredScoringResult = (
+  raw: string | null,
+): StoredScoringResult | null => {
+  if (!raw) {
+    return null;
+  }
+
+  try {
+    const parsed = JSON.parse(raw) as Partial<StoredScoringResult>;
+    if (
+      typeof parsed.score !== "number" ||
+      typeof parsed.risk_category !== "string" ||
+      !Array.isArray(parsed.factors) ||
+      !Array.isArray(parsed.recommendations)
+    ) {
+      return null;
+    }
+
+    return {
+      score: parsed.score,
+      risk_category: parsed.risk_category,
+      factors: parsed.factors.filter(
+        (item): item is string => typeof item === "string",
+      ),
+      recommendations: parsed.recommendations.filter(
+        (item): item is string => typeof item === "string",
+      ),
+      submitted_at:
+        typeof parsed.submitted_at === "string"
+          ? parsed.submitted_at
+          : new Date().toISOString(),
+      invoice_file_name:
+        typeof parsed.invoice_file_name === "string" ? parsed.invoice_file_name : "-",
+    };
+  } catch {
+    return null;
+  }
+};
+
 const ResultPage = () => {
-  const score = 75; // Mock score
+  const [scoringResult, setScoringResult] = useState<StoredScoringResult | null>(
+    null,
+  );
+  const [isHydrating, setIsHydrating] = useState(true);
   const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const [authToken, setAuthToken] = useState<string | null>(null);
+  const [savedResultId, setSavedResultId] = useState<string | null>(null);
   const [showLoginPrompt, setShowLoginPrompt] = useState(false);
   const [pendingAction, setPendingAction] = useState<ProtectedAction | null>(
     null,
@@ -42,48 +105,114 @@ const ResultPage = () => {
   const [actionError, setActionError] = useState<string | null>(null);
   const [actionSuccess, setActionSuccess] = useState<string | null>(null);
   const [isLoggingIn, setIsLoggingIn] = useState(false);
+  const [isProcessingAction, setIsProcessingAction] = useState(false);
 
-  // Mock data for the PDF report
-  const reportData = {
-    score: score,
-    positiveFactors: [
-      "Pembayaran tagihan selalu tepat waktu.",
-      "Memiliki riwayat kredit yang panjang dan baik.",
-      "Tingkat utilisasi kredit rendah.",
-    ],
-    negativeFactors: [
-      "Baru-baru ini mengajukan beberapa pinjaman baru.",
-      "Memiliki satu catatan keterlambatan pembayaran di masa lalu.",
-    ],
-    recommendations: [
-      "Hindari mengajukan terlalu banyak kredit dalam waktu singkat.",
-      "Terus pertahankan kebiasaan pembayaran yang baik.",
-      "Pertimbangkan untuk diversifikasi jenis kredit Anda.",
-    ],
+  const score = scoringResult?.score ?? 0;
+  const hasScoringResult = scoringResult !== null;
+
+  useEffect(() => {
+    if (typeof window === "undefined") {
+      setIsHydrating(false);
+      return;
+    }
+
+    const storedResult = parseStoredScoringResult(
+      window.sessionStorage.getItem(SESSION_SCORING_RESULT_KEY),
+    );
+    setScoringResult(storedResult);
+
+    const existingToken = window.sessionStorage.getItem(SESSION_AUTH_TOKEN_KEY);
+    if (!existingToken) {
+      setIsHydrating(false);
+      return;
+    }
+
+    setAuthToken(existingToken);
+    void getMe(existingToken)
+      .then(() => {
+        setIsLoggedIn(true);
+      })
+      .catch(() => {
+        setIsLoggedIn(false);
+        setAuthToken(null);
+        window.sessionStorage.removeItem(SESSION_AUTH_TOKEN_KEY);
+      })
+      .finally(() => {
+        setIsHydrating(false);
+      });
+  }, []);
+
+  const reportData = useMemo(
+    () => ({
+      score,
+      positiveFactors:
+        scoringResult?.factors.length && scoringResult.factors.length > 0
+          ? scoringResult.factors
+          : ["Belum ada faktor."],
+      negativeFactors: [] as string[],
+      recommendations:
+        scoringResult?.recommendations.length &&
+        scoringResult.recommendations.length > 0
+          ? scoringResult.recommendations
+          : ["Belum ada rekomendasi."],
+    }),
+    [score, scoringResult],
+  );
+
+  const ensureSavedResult = async (): Promise<string> => {
+    if (!authToken) {
+      throw new Error("Login diperlukan untuk aksi ini.");
+    }
+    if (!scoringResult) {
+      throw new Error(
+        "Hasil scoring belum tersedia. Silakan submit ulang dari halaman scoring.",
+      );
+    }
+    if (savedResultId) {
+      return savedResultId;
+    }
+
+    const created = await createResult(
+      {
+        score: scoringResult.score,
+        risk_category: scoringResult.risk_category,
+        factors: scoringResult.factors,
+        recommendations: scoringResult.recommendations,
+        metadata: {
+          submitted_at: scoringResult.submitted_at,
+          invoice_file_name: scoringResult.invoice_file_name,
+        },
+      },
+      authToken,
+    );
+    setSavedResultId(created.id);
+    return created.id;
   };
 
   const runProtectedAction = async (action: ProtectedAction) => {
     setActionError(null);
     setActionSuccess(null);
     setLastFailedAction(null);
+    setIsProcessingAction(true);
 
     try {
       if (action === "save") {
-        await new Promise((resolve) => setTimeout(resolve, 500));
+        await ensureSavedResult();
         setActionSuccess("Hasil berhasil disimpan ke akun Anda.");
         return;
       }
 
       if (action === "download") {
+        const resultId = await ensureSavedResult();
+        await exportResultPdf(resultId, authToken ?? "");
         generatePdfReport(reportData);
         setActionSuccess("Laporan PDF berhasil diunduh.");
         return;
       }
 
-      const currentUrl =
-        typeof window !== "undefined"
-          ? window.location.href
-          : "https://aksesa.id/result";
+      const resultId = await ensureSavedResult();
+      const shareResponse = await shareResult(resultId, authToken ?? "");
+      const currentUrl = shareResponse.share_url;
       const shareText = `Skor kredit saya di Aksesa: ${score}.`;
 
       if (
@@ -113,16 +242,33 @@ const ResultPage = () => {
 
       throw new Error("Perangkat Anda belum mendukung fitur bagikan.");
     } catch (error) {
+      if (error instanceof ApiError && error.code === "AUTH_REQUIRED") {
+        setIsLoggedIn(false);
+        setAuthToken(null);
+        if (typeof window !== "undefined") {
+          window.sessionStorage.removeItem(SESSION_AUTH_TOKEN_KEY);
+        }
+      }
       const message =
         error instanceof Error
           ? error.message
           : "Terjadi kendala saat menjalankan aksi. Silakan coba lagi.";
       setActionError(message);
       setLastFailedAction(action);
+    } finally {
+      setIsProcessingAction(false);
     }
   };
 
   const handleProtectedAction = (action: ProtectedAction) => {
+    if (!hasScoringResult) {
+      setActionSuccess(null);
+      setActionError(
+        "Hasil scoring belum tersedia. Silakan kembali ke halaman scoring.",
+      );
+      return;
+    }
+
     if (!isLoggedIn) {
       setPendingAction(action);
       setShowLoginPrompt(true);
@@ -154,11 +300,29 @@ const ResultPage = () => {
     }
 
     setIsLoggingIn(true);
-    await new Promise((resolve) => setTimeout(resolve, 700));
+    try {
+      const response = await login(loginEmail, loginPassword);
+      const token = response.access_token;
+
+      if (typeof window !== "undefined") {
+        window.sessionStorage.setItem(SESSION_AUTH_TOKEN_KEY, token);
+      }
+
+      setAuthToken(token);
+      setIsLoggedIn(true);
+      setShowLoginPrompt(false);
+      setActionSuccess("Login berhasil. Aksi Anda langsung diproses.");
+    } catch (error) {
+      const message =
+        error instanceof Error
+          ? error.message
+          : "Login gagal. Periksa email dan password Anda.";
+      setLoginError(message);
+      setIsLoggingIn(false);
+      return;
+    }
+
     setIsLoggingIn(false);
-    setIsLoggedIn(true);
-    setShowLoginPrompt(false);
-    setActionSuccess("Login berhasil. Aksi Anda langsung diproses.");
 
     const action = pendingAction;
     setPendingAction(null);
@@ -189,6 +353,12 @@ const ResultPage = () => {
             </CardHeader>
             <CardContent>
               <div className="flex flex-col items-center justify-center rounded-lg border border-[#dedbd6] bg-[#fffaf6] p-6">
+                {!hasScoringResult && !isHydrating ? (
+                  <div className="mb-4 w-full rounded-lg border border-[#fe4c02] bg-[#fff4ee] px-4 py-3 text-sm text-[#fe4c02]">
+                    Data hasil scoring belum ditemukan. Silakan submit ulang dari halaman
+                    scoring.
+                  </div>
+                ) : null}
                 <div className="mb-6 flex w-full items-start gap-2 rounded-lg border border-[#cde7c3] bg-[#f4fbf1] px-4 py-3 text-sm text-[#2c6415]">
                   <ShieldCheck className="mt-0.5 size-4 shrink-0" />
                   <p>
@@ -203,6 +373,7 @@ const ResultPage = () => {
                     variant="outline"
                     className="w-full border-[#2c6415] text-[#2c6415] hover:bg-[#2c6415] hover:text-white sm:w-auto"
                     onClick={() => handleProtectedAction("save")}
+                    disabled={isHydrating || isProcessingAction}
                   >
                     {!isLoggedIn ? (
                       <Lock className="mr-2 size-4" />
@@ -215,6 +386,7 @@ const ResultPage = () => {
                     variant="outline"
                     className="w-full border-[#111111] text-[#111111] hover:bg-[#111111] hover:text-white sm:w-auto"
                     onClick={() => handleProtectedAction("share")}
+                    disabled={isHydrating || isProcessingAction}
                   >
                     {!isLoggedIn ? (
                       <Lock className="mr-2 size-4" />
@@ -226,6 +398,7 @@ const ResultPage = () => {
                   <Button
                     className="w-full bg-[#ff5600] text-white hover:bg-[#e14b00] sm:w-auto"
                     onClick={() => handleProtectedAction("download")}
+                    disabled={isHydrating || isProcessingAction}
                   >
                     {!isLoggedIn ? (
                       <Lock className="mr-2 size-4" />
@@ -247,9 +420,8 @@ const ResultPage = () => {
                       <Button
                         variant="outline"
                         className="mt-3 border-[#fe4c02] text-[#fe4c02] hover:bg-[#fe4c02] hover:text-white"
-                        onClick={() =>
-                          void runProtectedAction(lastFailedAction)
-                        }
+                        onClick={() => void runProtectedAction(lastFailedAction)}
+                        disabled={isProcessingAction}
                       >
                         Coba Lagi
                       </Button>
@@ -261,8 +433,8 @@ const ResultPage = () => {
           </Card>
 
           <div className="grid grid-cols-1 gap-8 lg:grid-cols-2">
-            <FactorBreakdown />
-            <RecommendationCard />
+            <FactorBreakdown factors={scoringResult?.factors} />
+            <RecommendationCard recommendations={scoringResult?.recommendations} />
           </div>
 
           <div className="grid grid-cols-1 gap-8 lg:grid-cols-2">
@@ -282,8 +454,7 @@ const ResultPage = () => {
                     Login Diperlukan
                   </p>
                   <CardTitle className="mt-2 text-xl text-[#111111]">
-                    Lanjutkan{" "}
-                    {pendingAction ? actionLabels[pendingAction] : "aksi"}
+                    Lanjutkan {pendingAction ? actionLabels[pendingAction] : "aksi"}
                   </CardTitle>
                 </div>
                 <button

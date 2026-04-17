@@ -9,7 +9,16 @@ const mockFactors = [
   { name: "Rasio Utang", weight: 0.4, positive: false },
 ];
 
-const FactorBreakdown = () => {
+interface FactorBreakdownProps {
+  factors?: string[];
+}
+
+const FactorBreakdown = ({ factors }: FactorBreakdownProps) => {
+  const factorItems =
+    factors && factors.length > 0
+      ? factors.map((name) => ({ name, weight: 0.7, positive: true }))
+      : mockFactors;
+
   return (
     <Card className="border-[#dedbd6] bg-white">
       <CardHeader>
@@ -19,7 +28,7 @@ const FactorBreakdown = () => {
       </CardHeader>
       <CardContent>
         <ul className="space-y-3">
-          {mockFactors.map((factor) => (
+          {factorItems.map((factor) => (
             <li key={factor.name} className="flex items-center justify-between">
               <div className="flex items-center">
                 {factor.positive ? (

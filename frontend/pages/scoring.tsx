@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import { useRouter } from "next/router";
 import {
   useForm,
   FormProvider,
@@ -29,6 +30,11 @@ import {
   Check,
   ShieldCheck,
 } from "lucide-react";
+import {
+  SESSION_SCORING_RESULT_KEY,
+  submitScoring,
+  uploadInvoiceForOcr,
+} from "@/lib/api";
 
 const stepLabels = ["Invoice", "Transaksi", "Marketplace", "Profil Bisnis"];
 
@@ -67,7 +73,9 @@ const flattenErrors = (errors: FieldErrors<ScoringFormValues>): string[] => {
 
 const ScoringPageContent = () => {
   const [step, setStep] = useState(1);
+  const [submitError, setSubmitError] = useState<string | null>(null);
   const totalSteps = 4;
+  const router = useRouter();
 
   const methods = useForm<ScoringFormValues>({
     resolver: zodResolver(scoringFormSchema) as any,
@@ -129,10 +137,49 @@ const ScoringPageContent = () => {
   };
   const prevStep = () => setStep((prev) => Math.max(prev - 1, 1));
 
-  const onSubmit = (data: ScoringFormValues) => {
-    console.log(data);
-    // Mock API call
-    return new Promise((resolve) => setTimeout(resolve, 2000));
+  const onSubmit = async (data: ScoringFormValues) => {
+    setSubmitError(null);
+
+    const fileList = data.file as FileList | undefined;
+    const invoiceFile = fileList?.[0];
+    if (!invoiceFile) {
+      setSubmitError("File invoice tidak ditemukan. Coba upload ulang.");
+      return;
+    }
+
+    try {
+      await uploadInvoiceForOcr(invoiceFile);
+      const scoringResult = await submitScoring({
+        transactions: data.transactions.map((item) => ({
+          date: item.date,
+          amount: Number(item.amount),
+        })),
+        tokopedia: Number(data.tokopedia ?? 0),
+        shopee: Number(data.shopee ?? 0),
+        businessAge: Number(data.businessAge),
+        employees: Number(data.employees),
+        location: data.location,
+      });
+
+      if (typeof window !== "undefined") {
+        const payload = {
+          ...scoringResult,
+          submitted_at: new Date().toISOString(),
+          invoice_file_name: invoiceFile.name,
+        };
+        window.sessionStorage.setItem(
+          SESSION_SCORING_RESULT_KEY,
+          JSON.stringify(payload),
+        );
+      }
+
+      await router.push("/result");
+    } catch (error) {
+      const fallbackMessage = "Gagal memproses scoring. Silakan coba lagi.";
+      const message =
+        error instanceof Error ? error.message : fallbackMessage;
+      setSubmitError(message);
+    }
   };
 
   const renderStep = () => {
@@ -192,6 +239,11 @@ const ScoringPageContent = () => {
                         <li key={message}>{message}</li>
                       ))}
                     </ul>
+                  </div>
+                ) : null}
+                {submitError ? (
+                  <div className="mb-8 border border-[#fe4c02] bg-[#fff4ee] p-5 text-sm text-[#fe4c02] rounded-lg">
+                    {submitError}
                   </div>
                 ) : null}
 

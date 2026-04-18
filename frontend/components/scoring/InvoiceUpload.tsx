@@ -15,60 +15,59 @@ const InvoiceUpload = () => {
   const hasFile = file && file.length > 0;
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-7">
       <div className="space-y-2">
-        <h3 className="text-xl font-semibold text-slate-100 flex items-center gap-2">
-          <FileImage className="text-orange-500 w-6 h-6" />
+        <h3 className="flex items-center gap-2 text-[26px] font-semibold tracking-[-0.4px] text-[#1f1d1a]">
+          <FileImage className="h-6 w-6 text-[#ff5600]" />
           Upload Invoice atau Nota
         </h3>
-        <p className="text-slate-400 text-sm">
-          Unggah bukti nota penjualan atau invoice terbaru untuk membantu kami memverifikasi omset bisnis Anda.
+        <p className="max-w-3xl text-[16px] leading-relaxed text-[#5f5b54]">
+          Unggah bukti nota penjualan atau invoice terbaru untuk membantu kami
+          memverifikasi omset bisnis Anda.
         </p>
       </div>
 
       <div className="relative group w-full">
-        {/* Glow effect behind the box */}
-        <div className={`absolute -inset-1 rounded-2xl blur-lg transition duration-500 opacity-20 group-hover:opacity-60 ${
-          errors.file ? 'bg-rose-500/50' : hasFile ? 'bg-emerald-500/50' : 'bg-orange-500/30'
-        }`}></div>
-        
         <label
           htmlFor="dropzone-file"
-          className={`relative z-10 flex h-72 w-full cursor-pointer flex-col items-center justify-center rounded-2xl border-2 border-dashed transition-all duration-300 bg-slate-900/80 backdrop-blur-sm ${
-            errors.file 
-              ? "border-rose-500/50 hover:border-rose-500/80" 
+          className={`relative z-10 flex h-64 w-full cursor-pointer flex-col items-center justify-center rounded-xl border transition-all duration-300 dark:!text-[#1f1d1a] ${
+            errors.file
+              ? "border-[#c41c1c] bg-[#fff7f7]"
               : hasFile
-                ? "border-emerald-500/50 hover:border-emerald-500/80"
-                : "border-slate-700/80 hover:border-orange-500/60 hover:bg-slate-800/80"
+                ? "border-[#2c6415] bg-[#f3faef]"
+                : "border-[#dad4cc] border-dashed bg-[#fffdfa] hover:border-[#ff5600] hover:bg-white"
           }`}
         >
           <div className="flex flex-col items-center justify-center p-8 text-center">
             {hasFile ? (
               <>
-                <div className="w-20 h-20 mb-4 rounded-full bg-emerald-500/10 flex items-center justify-center border border-emerald-500/20 shadow-[0_0_20px_rgba(16,185,129,0.2)]">
-                  <FileCheck className="h-10 w-10 text-emerald-400 drop-shadow-md" />
+                <div className="mb-4 flex h-20 w-20 items-center justify-center rounded-lg bg-white border border-[#cde6c4]">
+                  <FileCheck className="h-10 w-10 text-[#2c6415]" />
                 </div>
-                <p className="mb-2 text-lg font-medium text-emerald-400">
+                <p className="mb-2 text-[18px] font-semibold text-[#2c6415]">
                   File berhasil dipilih
                 </p>
-                <p className="text-sm mb-4 text-slate-300 truncate max-w-xs px-4 py-2 bg-slate-800/60 rounded-lg border border-slate-700">
+                <p className="mb-4 max-w-xs truncate rounded-md border border-[#cde6c4] bg-white px-4 py-2 text-[15px] text-[#1f1d1a]">
                   {file[0]?.name}
                 </p>
-                <p className="text-xs text-slate-500 transition-colors group-hover:text-slate-300">
+                <p className="text-[14px] text-[#5f5b54]">
                   Klik untuk mengganti file
                 </p>
               </>
             ) : (
               <>
-                <div className="w-20 h-20 mb-6 rounded-full bg-slate-800 flex items-center justify-center border border-slate-700 shadow-inner group-hover:scale-110 group-hover:bg-slate-800/80 transition-all duration-300">
-                  <UploadCloud className="h-10 w-10 text-slate-400 group-hover:text-orange-400 transition-colors" />
+                <div className="mb-5 flex h-16 w-16 items-center justify-center rounded-lg border border-[#dcd6ce] bg-white transition-all duration-300 group-hover:border-[#ff5600] group-hover:scale-105">
+                  <UploadCloud className="h-10 w-10 text-[#9c9fa5] transition-colors group-hover:text-[#ff5600]" />
                 </div>
-                <p className="mb-3 text-base text-slate-300">
-                  <span className="font-semibold text-orange-400 group-hover:text-orange-300">Klik untuk upload</span> atau seret dan lepas
+                <p className="mb-3 text-[17px] text-[#5f5b54]">
+                  <span className="font-semibold text-[#ff5600]">
+                    Klik untuk upload
+                  </span>{" "}
+                  atau seret dan lepas
                 </p>
-                <div className="flex items-center gap-2 text-xs font-medium text-slate-500 bg-slate-800/50 px-3 py-1.5 rounded-md border border-slate-700/50">
+                <div className="flex items-center gap-2 rounded-md border border-[#ddd7cf] bg-white px-3 py-1.5 text-[11px] font-semibold uppercase tracking-[0.08em] text-[#6a655e]">
                   <span>PNG, JPG</span>
-                  <span className="w-1 h-1 rounded-full bg-slate-600"></span>
+                  <span className="h-1 w-1 rounded-full bg-[#d3cec6]"></span>
                   <span>Maks. 5MB</span>
                 </div>
               </>
@@ -85,8 +84,10 @@ const InvoiceUpload = () => {
       </div>
 
       {errors.file && (
-        <div className="flex items-center gap-2 text-sm text-rose-400 bg-rose-500/10 border border-rose-500/20 px-4 py-3 rounded-lg">
-          <span className="flex items-center justify-center w-4 h-4 rounded-full bg-rose-500 text-white text-[10px] font-bold">!</span>
+        <div className="flex items-center gap-2 rounded-lg border border-[#c41c1c]/30 bg-[#fff7f7] px-4 py-3 text-sm text-[#c41c1c]">
+          <span className="flex h-4 w-4 items-center justify-center rounded-full bg-[#c41c1c] text-[10px] font-bold text-white">
+            !
+          </span>
           {errors.file.message as string}
         </div>
       )}

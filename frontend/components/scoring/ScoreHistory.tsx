@@ -31,8 +31,10 @@ const getBadgeVariant = (status: string) => {
 const ScoreHistory = () => {
   return (
     <div>
-      <h3 className="mb-4 text-lg font-semibold text-[#111111]">Riwayat Skor</h3>
-      <Table>
+      <h3 className="mb-4 text-lg font-semibold text-[#111111]">
+        Riwayat Skor
+      </h3>
+      <Table className="min-w-[440px]">
         <TableHeader>
           <TableRow>
             <TableHead>Tanggal</TableHead>
@@ -43,8 +45,10 @@ const ScoreHistory = () => {
         <TableBody>
           {mockHistory.map((item) => (
             <TableRow key={item.date}>
-              <TableCell className="font-medium">{item.date}</TableCell>
-              <TableCell>{item.score}</TableCell>
+              <TableCell className="font-medium whitespace-nowrap">
+                {item.date}
+              </TableCell>
+              <TableCell className="whitespace-nowrap">{item.score}</TableCell>
               <TableCell className="text-right">
                 <Badge variant={getBadgeVariant(item.status)}>
                   {item.status}

@@ -1,281 +1,146 @@
-# Design System Inspired by ClickHouse
+# Design System Inspired by Intercom
 
 ## 1. Visual Theme & Atmosphere
 
-ClickHouse's interface is a high-performance cockpit rendered in acid yellow-green on obsidian black — a design that screams "speed" before you read a single word. The entire experience lives in darkness: pure black backgrounds (`#000000`) with dark charcoal cards (`#414141` borders) creating a terminal-grade aesthetic where the only chromatic interruption is the signature neon yellow-green (`#faff69`) that slashes across CTAs, borders, and highlighted moments like a highlighter pen on a dark console.
+Intercom's website is a warm, confident customer service platform that communicates "AI-first helpdesk" through a clean, editorial design language. The page operates on a warm off-white canvas (`#faf9f6`) with off-black (`#111111`) text, creating an intimate, magazine-like reading experience. The signature Fin Orange (`#ff5600`) — named after Intercom's AI agent — serves as the singular vibrant accent against the warm neutral palette.
 
-The typography is aggressively heavy — Inter at weight 900 (Black) for the hero headline at 96px creates text blocks that feel like they have physical mass. This "database for AI" site communicates raw power through visual weight: thick type, high-contrast neon accents, and performance stats displayed as oversized numbers. There's nothing subtle about ClickHouse's design, and that's entirely the point — it mirrors the product's promise of extreme speed and performance.
+The typography uses Saans — a custom geometric sans-serif with aggressive negative letter-spacing (-2.4px at 80px, -0.48px at 24px) and a consistent 1.00 line-height across all heading sizes. This creates ultra-compressed, billboard-like headlines that feel engineered and precise. Serrif provides the serif companion for editorial moments, and SaansMono handles code and uppercase technical labels. MediumLL and LLMedium appear for specific UI contexts, creating a rich five-font ecosystem.
 
-What makes ClickHouse distinctive is the electrifying tension between the near-black canvas and the neon yellow-green accent. This color combination (`#faff69` on `#000000`) creates one of the highest-contrast pairings in any tech brand, making every CTA button, every highlighted card, and every accent border impossible to miss. Supporting this is a forest green (`#166534`) for secondary CTAs that adds depth to the action hierarchy without competing with the neon.
+What distinguishes Intercom is its remarkably sharp geometry — 4px border-radius on buttons creates near-rectangular interactive elements that feel industrial and precise, contrasting with the warm surface colors. Button hover states use `scale(1.1)` expansion, creating a physical "growing" interaction. The border system uses warm oat tones (`#dedbd6`) and oklab-based opacity values for sophisticated color management.
 
 **Key Characteristics:**
-- Pure black canvas (#000000) with neon yellow-green (#faff69) accent — maximum contrast
-- Extra-heavy display typography: Inter at weight 900 (Black) up to 96px
-- Dark charcoal card system with #414141 borders at 80% opacity
-- Forest green (#166534) secondary CTA buttons
-- Performance stats as oversized display numbers
-- Uppercase labels with wide letter-spacing (1.4px) for navigation structure
-- Active/pressed state shifts text to pale yellow (#f4f692)
-- All links hover to neon yellow-green — unified interactive signal
-- Inset shadows on select elements creating "pressed into the surface" depth
+- Warm off-white canvas (`#faf9f6`) with oat-toned borders (`#dedbd6`)
+- Saans font with extreme negative tracking (-2.4px at 80px) and 1.00 line-height
+- Fin Orange (`#ff5600`) as singular brand accent
+- Sharp 4px border-radius — near-rectangular buttons and elements
+- Scale(1.1) hover with scale(0.85) active — physical button interaction
+- SaansMono uppercase labels with wide tracking (0.6px–1.2px)
+- Rich multi-color report palette (blue, green, red, pink, lime, orange)
+- oklab color values for sophisticated opacity management
 
 ## 2. Color Palette & Roles
 
 ### Primary
-- **Neon Volt** (`#faff69`): The signature brand color — a vivid acid yellow-green that's the sole chromatic accent on the black canvas. Used for primary CTAs, accent borders, link hovers, and highlighted moments.
-- **Forest Green** (`#166534`): Secondary CTA color — a deep, saturated green for "Get Started" and primary action buttons that need distinction from the neon.
-- **Dark Forest** (`#14572f`): A darker green variant for borders and secondary accents.
+- **Off Black** (`#111111`): `--color-off-black`, primary text, button backgrounds
+- **Pure White** (`#ffffff`): `--wsc-color-content-primary`, primary surface
+- **Warm Cream** (`#faf9f6`): Button backgrounds, card surfaces
+- **Fin Orange** (`#ff5600`): `--color-fin`, primary brand accent
+- **Report Orange** (`#fe4c02`): `--color-report-orange`, data visualization
 
-### Secondary & Accent
-- **Pale Yellow** (`#f4f692`): Active/pressed state text color — a softer, more muted version of Neon Volt for state feedback.
-- **Border Olive** (`#4f5100`): A dark olive-yellow for ghost button borders — the neon's muted sibling.
-- **Olive Dark** (`#161600`): The darkest neon-tinted color for subtle brand text.
+### Report Palette
+- **Report Blue** (`#65b5ff`): `--color-report-blue`
+- **Report Green** (`#0bdf50`): `--color-report-green`
+- **Report Red** (`#c41c1c`): `--color-report-red`
+- **Report Pink** (`#ff2067`): `--color-report-pink`
+- **Report Lime** (`#b3e01c`): `--color-report-lime-300`
+- **Green** (`#00da00`): `--color-green`
+- **Deep Blue** (`#0007cb`): Deep blue accent
 
-### Surface & Background
-- **Pure Black** (`#000000`): The primary page background — absolute black for maximum contrast.
-- **Near Black** (`#141414`): Button backgrounds and slightly elevated dark surfaces.
-- **Charcoal** (`#414141`): The primary border color at 80% opacity — the workhorse for card and container containment.
-- **Deep Charcoal** (`#343434`): Darker border variant for subtle division lines.
-- **Hover Gray** (`#3a3a3a`): Button hover state background — slightly lighter than Near Black.
-
-### Neutrals & Text
-- **Pure White** (`#ffffff`): Primary text on dark surfaces.
-- **Silver** (`#a0a0a0`): Secondary body text and muted content.
-- **Mid Gray** (`#585858` at 28%): Subtle gray overlay for depth effects.
-- **Border Gray** (`#e5e7eb`): Light border variant (used in rare light contexts).
-
-### Gradient System
-- **None in the traditional sense.** ClickHouse uses flat color blocks and high-contrast borders. The "gradient" is the contrast itself — neon yellow-green against pure black creates a visual intensity that gradients would dilute.
+### Neutral Scale (Warm)
+- **Black 80** (`#313130`): `--wsc-color-black-80`, dark neutral
+- **Black 60** (`#626260`): `--wsc-color-black-60`, mid neutral
+- **Black 50** (`#7b7b78`): `--wsc-color-black-50`, muted text
+- **Content Tertiary** (`#9c9fa5`): `--wsc-color-content-tertiary`
+- **Oat Border** (`#dedbd6`): Warm border color
+- **Warm Sand** (`#d3cec6`): Light warm neutral
 
 ## 3. Typography Rules
 
-### Font Family
-- **Primary**: `Inter` (Next.js optimized variant `__Inter_d1b8ee`)
-- **Secondary Display**: `Basier` (`__basier_a58b65`), with fallbacks: `Arial, Helvetica`
-- **Code**: `Inconsolata` (`__Inconsolata_a25f62`)
+### Font Families
+- **Primary**: `Saans`, fallbacks: `Saans Fallback, ui-sans-serif, system-ui`
+- **Serif**: `Serrif`, fallbacks: `Serrif Fallback, ui-serif, Georgia`
+- **Monospace**: `SaansMono`, fallbacks: `SaansMono Fallback, ui-monospace`
+- **UI**: `MediumLL` / `LLMedium`, fallbacks: `system-ui, -apple-system`
 
 ### Hierarchy
 
-| Role | Font | Size | Weight | Line Height | Letter Spacing | Notes |
-|------|------|------|--------|-------------|----------------|-------|
-| Display Mega | Inter | 96px (6rem) | 900 | 1.00 (tight) | normal | Maximum impact, extra-heavy |
-| Display / Hero | Inter | 72px (4.5rem) | 700 | 1.00 (tight) | normal | Section hero titles |
-| Feature Heading | Basier | 36px (2.25rem) | 600 | 1.30 (tight) | normal | Feature section anchors |
-| Sub-heading | Inter / Basier | 24px (1.5rem) | 600–700 | 1.17–1.38 | normal | Card headings |
-| Feature Title | Inter / Basier | 20px (1.25rem) | 600–700 | 1.40 | normal | Small feature titles |
-| Body Large | Inter | 18px (1.13rem) | 400–700 | 1.56 | normal | Intro paragraphs, button text |
-| Body / Button | Inter | 16px (1rem) | 400–700 | 1.50 | normal | Standard body, nav, buttons |
-| Caption | Inter | 14px (0.88rem) | 400–700 | 1.43 | normal | Metadata, descriptions, links |
-| Uppercase Label | Inter | 14px (0.88rem) | 600 | 1.43 | 1.4px | Section overlines, wide-tracked |
-| Code | Inconsolata | 16px (1rem) | 600 | 1.50 | normal | Code blocks, commands |
-| Small | Inter | 12px (0.75rem) | 500 | 1.33 | normal | Smallest text |
-| Micro | Inter | 11.2px (0.7rem) | 500 | 1.79 (relaxed) | normal | Tags, tiny labels |
-
-### Principles
-- **Weight 900 is the weapon**: The display headline uses Inter Black (900) — a weight most sites never touch. Combined with 96px size, this creates text with a physical, almost architectural presence.
-- **Full weight spectrum**: The system uses 400, 500, 600, 700, and 900 — covering the full gamut. Weight IS hierarchy.
-- **Uppercase with maximum tracking**: Section overlines use 1.4px letter-spacing — wider than most systems — creating bold structural labels that stand out against the dense dark background.
-- **Dual sans-serif**: Inter handles display and body; Basier handles feature section headings at 600 weight. This creates a subtle personality shift between "data/performance" (Inter) and "product/feature" (Basier) contexts.
+| Role | Font | Size | Weight | Line Height | Letter Spacing |
+|------|------|------|--------|-------------|----------------|
+| Display Hero | Saans | 80px | 400 | 1.00 (tight) | -2.4px |
+| Section Heading | Saans | 54px | 400 | 1.00 | -1.6px |
+| Sub-heading | Saans | 40px | 400 | 1.00 | -1.2px |
+| Card Title | Saans | 32px | 400 | 1.00 | -0.96px |
+| Feature Title | Saans | 24px | 400 | 1.00 | -0.48px |
+| Body Emphasis | Saans | 20px | 400 | 0.95 | -0.2px |
+| Nav / UI | Saans | 18px | 400 | 1.00 | normal |
+| Body | Saans | 16px | 400 | 1.50 | normal |
+| Body Light | Saans | 14px | 300 | 1.40 | normal |
+| Button | Saans | 16px / 14px | 400 | 1.50 / 1.43 | normal |
+| Button Bold | LLMedium | 16px | 700 | 1.20 | 0.16px |
+| Serif Body | Serrif | 16px | 300 | 1.40 | -0.16px |
+| Mono Label | SaansMono | 12px | 400–500 | 1.00–1.30 | 0.6px–1.2px uppercase |
 
 ## 4. Component Stylings
 
 ### Buttons
 
-**Neon Primary**
-- Background: Neon Volt (`#faff69`)
-- Text: Near Black (`#151515`)
-- Padding: 0px 16px
-- Radius: sharp (4px)
-- Border: `1px solid #faff69`
-- Hover: background shifts to dark (`rgb(29, 29, 29)`), text stays
-- Active: text shifts to Pale Yellow (`#f4f692`)
-- The eye-catching CTA — neon on black
-
-**Dark Solid**
-- Background: Near Black (`#141414`)
-- Text: Pure White (`#ffffff`)
-- Padding: 12px 16px
-- Radius: 4px or 8px
-- Border: `1px solid #141414`
-- Hover: bg shifts to Hover Gray (`#3a3a3a`), text to 80% opacity
-- Active: text to Pale Yellow
-- The standard action button
-
-**Forest Green**
-- Background: Forest Green (`#166534`)
-- Text: Pure White (`#ffffff`)
-- Padding: 12px 16px
-- Border: `1px solid #141414`
-- Hover: same dark shift
-- Active: Pale Yellow text
-- The "Get Started" / primary conversion button
-
-**Ghost / Outlined**
-- Background: transparent
-- Text: Pure White (`#ffffff`)
-- Padding: 0px 32px
+**Primary Dark**
+- Background: `#111111`
+- Text: `#ffffff`
+- Padding: 0px 14px
 - Radius: 4px
-- Border: `1px solid #4f5100` (olive-tinted)
-- Hover: dark bg shift
-- Active: Pale Yellow text
-- Secondary actions with neon-tinted border
+- Hover: white background, dark text, scale(1.1)
+- Active: green background (`#2c6415`), scale(0.85)
 
-**Pill Toggle**
+**Outlined**
 - Background: transparent
-- Radius: pill (9999px)
-- Used for toggle/switch elements
+- Text: `#111111`
+- Border: `1px solid #111111`
+- Radius: 4px
+- Same scale hover/active behavior
+
+**Warm Card Button**
+- Background: `#faf9f6`
+- Text: `#111111`
+- Padding: 16px
+- Border: `1px solid oklab(... / 0.1)`
 
 ### Cards & Containers
-- Background: transparent or Near Black
-- Border: `1px solid rgba(65, 65, 65, 0.8)` — the signature charcoal containment
-- Radius: 4px (small elements) or 8px (cards, containers)
-- Shadow Level 1: subtle (`rgba(0,0,0,0.1) 0px 1px 3px, rgba(0,0,0,0.1) 0px 1px 2px -1px`)
-- Shadow Level 2: medium (`rgba(0,0,0,0.1) 0px 10px 15px -3px, rgba(0,0,0,0.1) 0px 4px 6px -4px`)
-- Shadow Level 3: inset (`rgba(0,0,0,0.06) 0px 4px 4px, rgba(0,0,0,0.14) 0px 4px 25px inset`) — the "pressed" effect
-- Neon-highlighted cards: selected/active cards get neon yellow-green border or accent
+- Background: `#faf9f6` (warm cream)
+- Border: `1px solid #dedbd6` (warm oat)
+- Radius: 8px
+- No visible shadows
 
 ### Navigation
-- Dark nav on black background
-- Logo: ClickHouse wordmark + icon in yellow/neon
-- Links: white text, hover to Neon Volt (#faff69)
-- CTA: Neon Volt button or Forest Green button
-- Uppercase labels for categories
-
-### Distinctive Components
-
-**Performance Stats**
-- Oversized numbers (72px+, weight 700–900)
-- Brief descriptions beneath
-- High-contrast neon accents on key metrics
-- The primary visual proof of performance claims
-
-**Neon-Highlighted Card**
-- Standard dark card with neon yellow-green border highlight
-- Creates "selected" or "featured" treatment
-- The accent border makes the card pop against the dark canvas
-
-**Code Blocks**
-- Dark surface with Inconsolata at weight 600
-- Neon and white syntax highlighting
-- Terminal-like aesthetic
-
-**Trust Bar**
-- Company logos on dark background
-- Monochrome/white logo treatment
-- Horizontal layout
+- Saans 16px for links
+- Off-black text on white
+- Small 4px–6px radius buttons
+- Orange Fin accent for AI features
 
 ## 5. Layout Principles
 
-### Spacing System
-- Base unit: 8px
-- Scale: 2px, 6px, 7px, 8px, 10px, 12px, 16px, 20px, 24px, 25px, 32px, 40px, 44px, 48px, 64px
-- Button padding: 12px 16px (standard), 0px 16px (compact), 0px 32px (wide ghost)
-- Section vertical spacing: generous (48–64px)
-
-### Grid & Container
-- Max container width: up to 2200px (extra-wide) with responsive scaling
-- Hero: full-width dark with massive typography
-- Feature sections: multi-column card grids with dark borders
-- Stats: horizontal metric bar
-- Full-dark page — no light sections
-
-### Whitespace Philosophy
-- **Dark void as canvas**: The pure black background provides infinite depth — elements float in darkness.
-- **Dense information**: Feature cards and stats are packed with data, reflecting the database product's performance focus.
-- **Neon highlights as wayfinding**: Yellow-green accents guide the eye through the dark interface like runway lights.
-
-### Border Radius Scale
-- Sharp (4px): Buttons, badges, small elements, code blocks
-- Comfortable (8px): Cards, containers, dividers
-- Pill (9999px): Toggle buttons, status indicators
+### Spacing: 8px, 10px, 12px, 14px, 16px, 20px, 24px, 32px, 40px, 48px, 60px, 64px, 80px, 96px
+### Border Radius: 4px (buttons), 6px (nav items), 8px (cards, containers)
 
 ## 6. Depth & Elevation
-
-| Level | Treatment | Use |
-|-------|-----------|-----|
-| Flat (Level 0) | No shadow | Black background, text blocks |
-| Bordered (Level 1) | `1px solid rgba(65,65,65,0.8)` | Standard cards, containers |
-| Subtle (Level 2) | `0px 1px 3px rgba(0,0,0,0.1)` | Subtle card lift |
-| Elevated (Level 3) | `0px 10px 15px -3px rgba(0,0,0,0.1)` | Feature cards, hover states |
-| Pressed/Inset (Level 4) | `0px 4px 25px rgba(0,0,0,0.14) inset` | Active/pressed elements — "sunk into the surface" |
-| Neon Highlight (Level 5) | Neon Volt border (`#faff69`) | Featured/selected cards, maximum emphasis |
-
-**Shadow Philosophy**: ClickHouse uses shadows on a black canvas, where they're barely visible — they exist more for subtle dimensionality than obvious elevation. The most distinctive depth mechanism is the **inset shadow** (Level 4), which creates a "pressed into the surface" effect unique to ClickHouse. The neon border highlight (Level 5) is the primary attention-getting depth mechanism.
+Minimal shadows. Depth through warm border colors and surface tints.
 
 ## 7. Do's and Don'ts
 
 ### Do
-- Use Neon Volt (#faff69) as the sole chromatic accent — it must pop against pure black
-- Use Inter at weight 900 for hero display text — the extreme weight IS the personality
-- Keep everything on pure black (#000000) — never use dark gray as the page background
-- Use charcoal borders (rgba(65,65,65,0.8)) for all card containment
-- Apply Forest Green (#166534) for primary CTA buttons — distinct from neon for action hierarchy
-- Show performance stats as oversized display numbers — it's the core visual argument
-- Use uppercase with wide letter-spacing (1.4px) for section labels
-- Apply Pale Yellow (#f4f692) for active/pressed text states
-- Link hovers should ALWAYS shift to Neon Volt — unified interactive feedback
+- Use Saans with 1.00 line-height and negative tracking on all headings
+- Apply 4px radius on buttons — sharp geometry is the identity
+- Use Fin Orange (#ff5600) for AI/brand accent only
+- Apply scale(1.1) hover on buttons
+- Use warm neutrals (#faf9f6, #dedbd6)
 
 ### Don't
-- Don't introduce additional colors — the palette is strictly black, neon, green, and gray
-- Don't use the neon as a background fill — it's an accent and border color only (except on CTA buttons)
-- Don't reduce display weight below 700 — heavy weight is core to the personality
-- Don't use light/white backgrounds anywhere — the entire experience is dark
-- Don't round corners beyond 8px — the sharp geometry reflects database precision
-- Don't use soft/diffused shadows on black — they're invisible. Use border-based depth instead
-- Don't skip the inset shadow on active states — the "pressed" effect is distinctive
-- Don't use warm neutrals — all grays are perfectly neutral
+- Don't round buttons beyond 4px
+- Don't use Fin Orange decoratively
+- Don't use cool gray borders — always warm oat tones
+- Don't skip the negative tracking on headings
 
 ## 8. Responsive Behavior
-
-### Breakpoints
-| Name | Width | Key Changes |
-|------|-------|-------------|
-| Mobile | <640px | Single column, stacked cards |
-| Small Tablet | 640–768px | Minor adjustments |
-| Tablet | 768–1024px | 2-column grids |
-| Desktop | 1024–1280px | Standard layout |
-| Large Desktop | 1280–1536px | Expanded content |
-| Ultra-wide | 1536–2200px | Maximum container width |
-
-### Touch Targets
-- Buttons with 12px 16px padding minimum
-- Card surfaces as touch targets
-- Adequate nav link spacing
-
-### Collapsing Strategy
-- **Hero text**: 96px → 72px → 48px → 36px
-- **Feature grids**: Multi-column → 2 → 1 column
-- **Stats**: Horizontal → stacked
-- **Navigation**: Full → hamburger
-
-### Image Behavior
-- Product screenshots maintain aspect ratio
-- Code blocks use horizontal scroll on narrow screens
-- All images on dark backgrounds
+Breakpoints: 425px, 530px, 600px, 640px, 768px, 896px
 
 ## 9. Agent Prompt Guide
 
 ### Quick Color Reference
-- Brand Accent: "Neon Volt (#faff69)"
-- Page Background: "Pure Black (#000000)"
-- CTA Green: "Forest Green (#166534)"
-- Card Border: "Charcoal (rgba(65,65,65,0.8))"
-- Primary Text: "Pure White (#ffffff)"
-- Secondary Text: "Silver (#a0a0a0)"
-- Active State: "Pale Yellow (#f4f692)"
-- Button Surface: "Near Black (#141414)"
+- Text: Off Black (`#111111`)
+- Background: Warm Cream (`#faf9f6`)
+- Accent: Fin Orange (`#ff5600`)
+- Border: Oat (`#dedbd6`)
+- Muted: `#7b7b78`
 
 ### Example Component Prompts
-- "Create a hero section on Pure Black (#000000) with a massive headline at 96px Inter weight 900, line-height 1.0. Pure White text. Add a Neon Volt (#faff69) CTA button (dark text, 4px radius, 0px 16px padding) and a ghost button (transparent, 1px solid #4f5100 border)."
-- "Design a feature card on black with 1px solid rgba(65,65,65,0.8) border and 8px radius. Title at 24px Inter weight 700, body at 16px in Silver (#a0a0a0). Add a neon-highlighted variant with 1px solid #faff69 border."
-- "Build a performance stats bar: large numbers at 72px Inter weight 700 in Pure White. Brief descriptions at 14px in Silver. On black background."
-- "Create a Forest Green (#166534) CTA button: white text, 12px 16px padding, 4px radius, 1px solid #141414 border. Hover: bg shifts to #3a3a3a, text to 80% opacity."
-- "Design an uppercase section label: 14px Inter weight 600, letter-spacing 1.4px, uppercase. Silver (#a0a0a0) text on black background."
-
-### Iteration Guide
-1. Keep everything on pure black — no dark gray alternatives
-2. Neon Volt (#faff69) is for accents and CTAs only — never large backgrounds
-3. Weight 900 for hero, 700 for headings, 600 for labels, 400-500 for body
-4. Active states use Pale Yellow (#f4f692) — not just opacity changes
-5. All links hover to Neon Volt — consistent interactive feedback
-6. Charcoal borders (rgba(65,65,65,0.8)) are the primary depth mechanism
+- "Create hero: warm cream (#faf9f6) background. Saans 80px weight 400, line-height 1.00, letter-spacing -2.4px, #111111. Dark button (#111111, 4px radius). Hover: scale(1.1), white bg."

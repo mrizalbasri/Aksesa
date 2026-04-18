@@ -10,21 +10,24 @@ const ScoringStepper: React.FC<ScoringStepperProps> = ({
   currentStep,
   totalSteps,
 }) => {
-  const steps = ["Invoice", "Transaksi", "Marketplace", "Profil Bisnis"];
+  const steps = [
+    { full: "Invoice", short: "Inv" },
+    { full: "Transaksi", short: "Trans" },
+    { full: "Marketplace", short: "Market" },
+    { full: "Profil Bisnis", short: "Profil" },
+  ];
 
   return (
-    <div className="mt-8 relative mb-4">
-      {/* Background track line */}
-      <div className="absolute top-1/2 left-0 w-full h-[3px] -translate-y-1/2 bg-slate-800 rounded-full z-0 pointer-events-none" />
-      
-      {/* Active track line */}
-      <div 
-        className="absolute top-1/2 left-0 h-[3px] -translate-y-1/2 bg-gradient-to-r from-orange-500 to-rose-500 rounded-full z-0 transition-all duration-500 ease-out pointer-events-none" 
+    <div className="mt-8 relative mb-2 px-1">
+      <div className="absolute left-0 top-3.5 h-[2px] w-full rounded-full bg-[#e8e4de] z-0 pointer-events-none sm:top-4" />
+
+      <div
+        className="absolute left-0 top-3.5 h-[2px] rounded-full bg-[#ff5600] z-0 transition-all duration-300 pointer-events-none sm:top-4"
         style={{ width: `${((currentStep - 1) / (totalSteps - 1)) * 100}%` }}
       />
-      
-      <ol className="relative z-10 flex items-center justify-between w-full">
-        {steps.map((label, index) => {
+
+      <ol className="relative z-10 flex items-start justify-between w-full">
+        {steps.map((item, index) => {
           const stepNumber = index + 1;
           const isCompleted = currentStep > stepNumber;
           const isCurrent = currentStep === stepNumber;
@@ -32,23 +35,36 @@ const ScoringStepper: React.FC<ScoringStepperProps> = ({
           return (
             <li
               key={stepNumber}
-              className="flex flex-col items-center group"
+              className="flex min-w-0 flex-1 flex-col items-center gap-2 sm:gap-3"
             >
               <div
-                className={`flex size-10 sm:size-12 items-center justify-center rounded-full border-2 transition-all duration-300 shadow-lg ${
+                className={`flex size-7 items-center justify-center rounded-md border transition-all duration-300 shadow-sm sm:size-8 ${
                   isCompleted
-                    ? "border-emerald-500 bg-emerald-500 text-white shadow-emerald-500/20"
+                    ? "border-[#ff5600] bg-[#ff5600] text-white"
                     : isCurrent
-                      ? "border-orange-500 bg-slate-900 text-orange-400 shadow-orange-500/30 scale-110 ring-4 ring-orange-500/10"
-                      : "border-slate-700 bg-slate-900 text-slate-500"
+                      ? "border-[#ff5600] bg-[#fff7f1] text-[#ff5600]"
+                      : "border-[#d8d2ca] bg-[#fffdf9] text-[#6d6860]"
                 }`}
               >
-                {isCompleted ? <Check className="w-5 h-5 sm:w-6 sm:h-6" /> : <span className="text-sm sm:text-base font-semibold">{stepNumber}</span>}
+                {isCompleted ? (
+                  <Check className="h-4 w-4 sm:h-5 sm:w-5" />
+                ) : (
+                  <span className="text-[12px] font-medium sm:text-[14px]">
+                    {stepNumber}
+                  </span>
+                )}
               </div>
-              <span className={`absolute mt-14 sm:mt-16 text-xs sm:text-sm font-medium whitespace-nowrap transition-colors duration-300 ${
-                isCurrent ? 'text-orange-400' : isCompleted ? 'text-emerald-400' : 'text-slate-500'
-              }`}>
-                {label}
+              <span
+                className={`text-[10px] font-semibold tracking-[0.06em] uppercase text-center leading-tight transition-colors duration-300 sm:text-[12px] sm:tracking-[0.08em] ${
+                  isCurrent
+                    ? "text-[#ff5600]"
+                    : isCompleted
+                      ? "text-[#1f1d1a]"
+                      : "text-[#6d6860]"
+                }`}
+              >
+                <span className="sm:hidden">{item.short}</span>
+                <span className="hidden sm:inline">{item.full}</span>
               </span>
             </li>
           );

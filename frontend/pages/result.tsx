@@ -19,6 +19,7 @@ import {
 } from "lucide-react";
 import { generatePdfReport } from "@/lib/pdfGenerator";
 import {
+  AUTH_CHANGED_EVENT,
   ApiError,
   SESSION_AUTH_TOKEN_KEY,
   SESSION_SCORING_RESULT_KEY,
@@ -121,25 +122,50 @@ const ResultPage = () => {
     );
     setScoringResult(storedResult);
 
-    const existingToken = window.sessionStorage.getItem(SESSION_AUTH_TOKEN_KEY);
-    if (!existingToken) {
-      setIsHydrating(false);
-      return;
-    }
+    let active = true;
+    const syncAuthState = async () => {
+      const existingToken = window.sessionStorage.getItem(SESSION_AUTH_TOKEN_KEY);
+      if (!existingToken) {
+        if (active) {
+          setIsLoggedIn(false);
+          setAuthToken(null);
+          setIsHydrating(false);
+        }
+        return;
+      }
 
-    setAuthToken(existingToken);
-    void getMe(existingToken)
-      .then(() => {
-        setIsLoggedIn(true);
-      })
-      .catch(() => {
-        setIsLoggedIn(false);
-        setAuthToken(null);
+      if (active) {
+        setAuthToken(existingToken);
+      }
+      try {
+        await getMe(existingToken);
+        if (active) {
+          setIsLoggedIn(true);
+        }
+      } catch {
         window.sessionStorage.removeItem(SESSION_AUTH_TOKEN_KEY);
-      })
-      .finally(() => {
-        setIsHydrating(false);
-      });
+        window.dispatchEvent(new Event(AUTH_CHANGED_EVENT));
+        if (active) {
+          setIsLoggedIn(false);
+          setAuthToken(null);
+        }
+      } finally {
+        if (active) {
+          setIsHydrating(false);
+        }
+      }
+    };
+
+    void syncAuthState();
+    const handleAuthChanged = () => {
+      void syncAuthState();
+    };
+    window.addEventListener(AUTH_CHANGED_EVENT, handleAuthChanged);
+
+    return () => {
+      active = false;
+      window.removeEventListener(AUTH_CHANGED_EVENT, handleAuthChanged);
+    };
   }, []);
 
   const reportData = useMemo(
@@ -247,6 +273,7 @@ const ResultPage = () => {
         setAuthToken(null);
         if (typeof window !== "undefined") {
           window.sessionStorage.removeItem(SESSION_AUTH_TOKEN_KEY);
+          window.dispatchEvent(new Event(AUTH_CHANGED_EVENT));
         }
       }
       const message =
@@ -306,6 +333,7 @@ const ResultPage = () => {
 
       if (typeof window !== "undefined") {
         window.sessionStorage.setItem(SESSION_AUTH_TOKEN_KEY, token);
+        window.dispatchEvent(new Event(AUTH_CHANGED_EVENT));
       }
 
       setAuthToken(token);

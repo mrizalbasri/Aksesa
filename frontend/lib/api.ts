@@ -4,6 +4,7 @@ const API_BASE_URL =
 
 export const SESSION_SCORING_RESULT_KEY = "aksesa_scoring_result";
 export const SESSION_AUTH_TOKEN_KEY = "aksesa_auth_token";
+export const AUTH_CHANGED_EVENT = "aksesa-auth-changed";
 
 type RequestOptions = Omit<RequestInit, "headers"> & {
   token?: string;

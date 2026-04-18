@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import LandingHero from "./LandingHero";
 import FeatureCard from "./FeatureCard";
 import Footer from "./Footer";
@@ -11,6 +11,7 @@ import {
   LockKeyhole,
   ShieldCheck,
   Trash2,
+  ChevronDown,
   type LucideIcon,
 } from "lucide-react";
 
@@ -21,6 +22,7 @@ type LandingFeature = {
 };
 
 const LandingPage = () => {
+  const [openFaqIndex, setOpenFaqIndex] = useState<number | null>(0);
   const features: LandingFeature[] = [
     {
       title: "Input Data Alternatif",
@@ -147,7 +149,7 @@ const LandingPage = () => {
             return (
               <article
                 key={item.title}
-                className="rounded-lg border border-[#dedbd6] bg-white p-6 transition-colors hover:border-[#2c6415]"
+                className="rounded-lg border border-[#dedbd6] bg-white p-6 transition-all duration-200 ease-out hover:-translate-y-1 hover:border-[#2c6415] hover:shadow-[0_14px_30px_rgba(17,17,17,0.1)] motion-reduce:transform-none motion-reduce:transition-none motion-reduce:hover:shadow-none"
               >
                 <Icon className="mb-4 size-5 text-[#2c6415]" />
                 <h4 className="text-lg font-semibold text-[#111111]">
@@ -173,19 +175,56 @@ const LandingPage = () => {
         </div>
 
         <div className="space-y-4">
-          {faqs.map((faq) => (
-            <details
+          {faqs.map((faq, index) => {
+            const isOpen = openFaqIndex === index;
+            const panelId = `faq-panel-${index}`;
+            const buttonId = `faq-trigger-${index}`;
+
+            return (
+              <article
               key={faq.question}
-              className="group rounded-lg border border-[#dedbd6] bg-white p-5 transition-colors open:border-[#ff5600]"
-            >
-              <summary className="cursor-pointer list-none pr-8 text-base font-medium text-[#111111] marker:content-none">
-                {faq.question}
-              </summary>
-              <p className="mt-3 text-sm leading-relaxed text-[#626260]">
-                {faq.answer}
-              </p>
-            </details>
-          ))}
+                className={`rounded-lg border bg-white p-5 transition-colors duration-200 ${
+                  isOpen ? "border-[#ff5600]" : "border-[#dedbd6]"
+                }`}
+              >
+                <button
+                  id={buttonId}
+                  type="button"
+                  aria-expanded={isOpen}
+                  aria-controls={panelId}
+                  onClick={() =>
+                    setOpenFaqIndex((current) => (current === index ? null : index))
+                  }
+                  className="flex w-full items-center justify-between gap-3 text-left"
+                >
+                  <span className="text-base font-medium text-[#111111]">
+                    {faq.question}
+                  </span>
+                  <ChevronDown
+                    className={`size-4 shrink-0 text-[#626260] transition-transform duration-200 motion-reduce:transition-none ${
+                      isOpen ? "rotate-180" : "rotate-0"
+                    }`}
+                  />
+                </button>
+                <div
+                  id={panelId}
+                  role="region"
+                  aria-labelledby={buttonId}
+                  className={`grid overflow-hidden transition-[grid-template-rows,opacity,margin] duration-200 ease-out motion-reduce:transition-none ${
+                    isOpen
+                      ? "mt-3 grid-rows-[1fr] opacity-100"
+                      : "mt-0 grid-rows-[0fr] opacity-0"
+                  }`}
+                >
+                  <div className="min-h-0">
+                    <p className="text-sm leading-relaxed text-[#626260]">
+                      {faq.answer}
+                    </p>
+                  </div>
+                </div>
+              </article>
+            );
+          })}
         </div>
       </section>
 

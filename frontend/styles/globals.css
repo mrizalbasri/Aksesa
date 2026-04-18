@@ -21,6 +21,7 @@
 body {
   background-color: var(--surface);
   color: var(--text-primary);
+  color-scheme: light;
   @apply font-sans;
 }
 

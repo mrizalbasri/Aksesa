@@ -1,6 +1,6 @@
 import React, { useEffect, useRef, useState, type FormEvent } from "react";
 import Link from "next/link";
-import { X, Loader2 } from "lucide-react";
+import { X, Loader2, Menu as MenuIcon } from "lucide-react";
 import { animated, to, useTransition } from "@react-spring/web";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -207,34 +207,12 @@ const Navbar = () => {
           </nav>
 
           <div className="flex items-center gap-2 md:hidden">
-            <Link
-              href="/scoring"
-              className="inline-flex h-9 items-center justify-center rounded border border-[#111111] bg-[#111111] px-3 text-xs font-medium text-white transition-colors hover:bg-white hover:text-[#111111]"
-            >
-              Panel
-            </Link>
-            {isLoggedIn ? (
-              <Button
-                type="button"
-                variant="outline"
-                className="h-9 border-[#111111] px-3 text-xs text-[#111111] hover:bg-[#111111] hover:text-white"
-                onClick={handleLogout}
-              >
-                Logout
-              </Button>
-            ) : (
-              <Button
-                type="button"
-                variant="outline"
-                className="h-9 border-[#111111] px-3 text-xs text-[#111111] hover:bg-[#111111] hover:text-white"
-                onClick={openLoginPrompt}
-              >
-                Login
-              </Button>
-            )}
             <details className="group relative">
-              <summary className="list-none cursor-pointer rounded border border-[#111111] px-3 py-2 text-xs font-medium text-[#111111] transition-colors hover:bg-[#111111] hover:text-white">
-                Menu
+              <summary
+                aria-label="Buka menu navigasi"
+                className="list-none cursor-pointer rounded border border-[#111111] p-2 text-[#111111] transition-colors hover:bg-[#111111] hover:text-white"
+              >
+                <MenuIcon className="size-5" />
               </summary>
               <div className="absolute right-0 mt-2 w-52 rounded-md border border-[#dedbd6] bg-[#fffdf9] p-2 shadow-sm">
                 <Link
@@ -255,6 +233,23 @@ const Navbar = () => {
                 >
                   Akses Panel
                 </Link>
+                {isLoggedIn ? (
+                  <button
+                    type="button"
+                    className="mt-1 block w-full rounded px-3 py-2 text-left text-sm text-[#111111] transition-colors hover:bg-[#f5f4f1]"
+                    onClick={handleLogout}
+                  >
+                    Logout
+                  </button>
+                ) : (
+                  <button
+                    type="button"
+                    className="mt-1 block w-full rounded px-3 py-2 text-left text-sm text-[#111111] transition-colors hover:bg-[#f5f4f1]"
+                    onClick={openLoginPrompt}
+                  >
+                    Login
+                  </button>
+                )}
               </div>
             </details>
           </div>

@@ -63,8 +63,8 @@ const LandingHero = () => {
             </h1>
 
             <p className="mt-5 max-w-2xl text-base leading-relaxed text-[#313130] sm:text-lg">
-              Unggah nota dan isi transaksi singkat untuk melihat skor kelayakan
-              kredit yang jelas dan mudah dipahami.
+              Unggah nota 1 tahun, atau isi transaksi harian, atau input
+              penjualan marketplace — sesuai data yang Anda miliki.
             </p>
 
             <div className="mt-7 flex w-full flex-col gap-3 sm:w-auto sm:flex-row sm:gap-4">
@@ -94,7 +94,7 @@ const LandingHero = () => {
             </div>
 
             <p className="mt-4 text-xs font-semibold uppercase tracking-[0.08em] text-[#6a655e]">
-              Tanpa laporan bank formal.
+              Tidak perlu laporan bank. Gunakan data yang Anda punya.
             </p>
           </div>
 

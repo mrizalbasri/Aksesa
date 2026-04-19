@@ -25,9 +25,9 @@ const LandingPage = () => {
   const [openFaqIndex, setOpenFaqIndex] = useState<number | null>(0);
   const features: LandingFeature[] = [
     {
-      title: "Input Data Alternatif",
+      title: "Input Data Fleksibel",
       description:
-        "Lepaskan ketergantungan pada laporan standar. Upload nota, bon, dan kas harian Anda sebagai substitusi validasi formal.",
+        "Upload kumpulan nota 1 tahun, isi transaksi harian, atau input penjualan marketplace — sesuai kenyamanan Anda.",
       icon: FileText,
     },
     {
@@ -73,9 +73,9 @@ const LandingPage = () => {
         "Ya. Data digunakan khusus untuk proses penilaian kredit dan ditampilkan secara terbatas sesuai kebutuhan analisis.",
     },
     {
-      question: "Siapa yang bisa menggunakan Aksesa?",
+      question: "Saya tidak punya nota selama 1 tahun, bisa bagaimana?",
       answer:
-        "Pelaku UMKM yang belum punya laporan keuangan formal tetap bisa menggunakan Aksesa dengan data alternatif seperti nota dan transaksi harian.",
+        "Tidak masalah. Anda bisa input manual transaksi harian, atau kalau jualan di marketplace seperti Tokopedia/Shopee, bisa langsung input angka penjualan marketplace. Gunakan saja data yang Anda punya.",
     },
     {
       question: "Berapa lama proses scoring berlangsung?",

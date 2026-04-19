@@ -172,6 +172,7 @@ const ResultPage = () => {
   const reportData = useMemo(
     () => ({
       score,
+      riskCategory: scoringResult?.risk_category || "Sedang",
       positiveFactors:
         scoringResult?.factors.length && scoringResult.factors.length > 0
           ? scoringResult.factors
@@ -182,6 +183,8 @@ const ResultPage = () => {
         scoringResult.recommendations.length > 0
           ? scoringResult.recommendations
           : ["Belum ada rekomendasi."],
+      submittedAt: scoringResult?.submitted_at || new Date().toISOString(),
+      invoiceFileName: scoringResult?.invoice_file_name || "-",
     }),
     [score, scoringResult],
   );

@@ -19,10 +19,10 @@ const ScoringStepper: React.FC<ScoringStepperProps> = ({
 
   return (
     <div className="mt-8 relative mb-2 px-1">
-      <div className="absolute left-0 top-3.5 h-[2px] w-full rounded-full bg-[#e8e4de] z-0 pointer-events-none sm:top-4" />
+      <div className="pointer-events-none absolute left-0 top-3.5 z-0 h-[2px] w-full rounded-full bg-[#efeae3] sm:top-4" />
 
       <div
-        className="absolute left-0 top-3.5 h-[2px] rounded-full bg-[#ff5600] z-0 transition-all duration-300 pointer-events-none sm:top-4"
+        className="pointer-events-none absolute left-0 top-3.5 z-0 h-[2px] rounded-full bg-[#ff5600] transition-all duration-300 sm:top-4"
         style={{ width: `${((currentStep - 1) / (totalSteps - 1)) * 100}%` }}
       />
 
@@ -43,7 +43,7 @@ const ScoringStepper: React.FC<ScoringStepperProps> = ({
                     ? "border-[#ff5600] bg-[#ff5600] text-white"
                     : isCurrent
                       ? "border-[#ff5600] bg-[#fff7f1] text-[#ff5600]"
-                      : "border-[#d8d2ca] bg-[#fffdf9] text-[#6d6860]"
+                      : "border-[#dedbd6] bg-[#fffdf9] text-[#7b7b78]"
                 }`}
               >
                 {isCompleted ? (
@@ -59,8 +59,8 @@ const ScoringStepper: React.FC<ScoringStepperProps> = ({
                   isCurrent
                     ? "text-[#ff5600]"
                     : isCompleted
-                      ? "text-[#1f1d1a]"
-                      : "text-[#6d6860]"
+                      ? "text-[#111111]"
+                      : "text-[#7b7b78]"
                 }`}
               >
                 <span className="sm:hidden">{item.short}</span>

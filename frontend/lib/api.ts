@@ -178,6 +178,15 @@ export function login(
   });
 }
 
+export function loginWithGoogle(
+  credential: string,
+): Promise<LoginResponsePayload> {
+  return requestJson<LoginResponsePayload>("/api/v1/auth/google", {
+    method: "POST",
+    body: JSON.stringify({ credential }),
+  });
+}
+
 export function getMe(token: string): Promise<MeResponsePayload> {
   return requestJson<MeResponsePayload>("/api/v1/auth/me", { token });
 }

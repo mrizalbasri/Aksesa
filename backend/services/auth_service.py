@@ -4,6 +4,7 @@ from dataclasses import dataclass
 from datetime import datetime, timedelta, timezone
 from functools import lru_cache
 
+import httpx
 from fastapi import Depends
 from fastapi.security import HTTPAuthorizationCredentials, HTTPBearer
 from jose import JWTError, jwt
@@ -116,15 +117,70 @@ def decode_access_token(token: str) -> AuthUser:
             status_code=401,
         )
 
-    demo_user = _get_demo_user()
-    if email.strip().lower() != demo_user.email:
+    return AuthUser(id=user_id, email=email, name=name, role=role)
+
+
+async def authenticate_google_credential(credential: str) -> AuthUser:
+    google_client_id = os.getenv("GOOGLE_CLIENT_ID", "").strip()
+    if not google_client_id:
         raise ServiceError(
-            code="AUTH_REQUIRED",
-            message="Login diperlukan untuk aksi ini.",
+            code="GOOGLE_DISABLED",
+            message="Login Google belum dikonfigurasi di server.",
+            status_code=503,
+        )
+
+    async with httpx.AsyncClient() as client:
+        response = await client.get(
+            "https://oauth2.googleapis.com/tokeninfo",
+            params={"id_token": credential},
+            timeout=15.0,
+        )
+
+    if response.status_code != 200:
+        raise ServiceError(
+            code="INVALID_GOOGLE_TOKEN",
+            message="Token Google tidak valid atau sudah kedaluwarsa.",
             status_code=401,
         )
 
-    return AuthUser(id=user_id, email=email, name=name, role=role)
+    data = response.json()
+    if data.get("aud") != google_client_id:
+        raise ServiceError(
+            code="INVALID_GOOGLE_TOKEN",
+            message="Token Google tidak cocok untuk aplikasi ini.",
+            status_code=401,
+        )
+
+    email_raw = data.get("email")
+    if not email_raw or not isinstance(email_raw, str):
+        raise ServiceError(
+            code="INVALID_GOOGLE_TOKEN",
+            message="Email tidak tersedia dari akun Google.",
+            status_code=401,
+        )
+
+    email_verified = data.get("email_verified")
+    if email_verified in (False, "false", "False", 0):
+        raise ServiceError(
+            code="EMAIL_NOT_VERIFIED",
+            message="Email Google Anda belum diverifikasi.",
+            status_code=401,
+        )
+
+    sub = data.get("sub")
+    name = data.get("name") or email_raw.split("@")[0]
+    if not isinstance(name, str):
+        name = email_raw.split("@")[0]
+
+    safe_sub = str(sub) if sub is not None else email_raw
+    user_id = f"google-{safe_sub}"[:80]
+
+    return AuthUser(
+        id=user_id,
+        email=email_raw.strip().lower(),
+        name=name[:160],
+        role="user",
+    )
 
 
 def get_current_user(

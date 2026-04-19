@@ -38,6 +38,28 @@ import {
 
 const stepLabels = ["Invoice", "Transaksi", "Marketplace", "Profil Bisnis"];
 
+const stepHeadings: { title: string; description: string }[] = [
+  {
+    title: "Upload invoice atau nota",
+    description:
+      "Unggah dokumen penjualan sebagai dasar validasi data bisnis Anda.",
+  },
+  {
+    title: "Riwayat transaksi harian",
+    description: "Catat transaksi nyata agar pola arus kas bisa dianalisis.",
+  },
+  {
+    title: "Penjualan marketplace",
+    description:
+      "Opsional — tambahkan angka dari Tokopedia atau Shopee jika relevan.",
+  },
+  {
+    title: "Profil bisnis",
+    description:
+      "Lama usaha, lokasi, dan tenaga kerja membantu konteks risiko.",
+  },
+];
+
 const stepFields: Record<number, Path<ScoringFormValues>[]> = {
   1: ["file"],
   2: ["transactions"],
@@ -206,21 +228,22 @@ const ScoringPageContent = () => {
         <div className="grid gap-6 lg:grid-cols-[minmax(0,1fr)_300px] max-w-5xl mx-auto">
           {/* Main Form Content */}
           <div className="order-2 lg:order-1 flex flex-col gap-6">
-            <Card className="border-[#ddd7cf] bg-[#ffffff] rounded-xl shadow-sm dark:!border-[#ddd7cf] dark:!bg-[#ffffff] dark:!text-[#1f1d1a]">
-              <CardHeader className="space-y-6 border-b border-[#e2ddd6] pb-7 pt-7 px-4 sm:px-7 dark:!border-[#e2ddd6]">
+            <Card className="rounded-xl border-[#dedbd6] bg-white shadow-sm">
+              <CardHeader className="space-y-6 border-b border-[#dedbd6] px-4 pb-7 pt-7 sm:px-7">
                 <div className="space-y-2">
-                  <div className="inline-block text-[#6a655e] font-semibold text-[11px] uppercase tracking-[0.08em]">
-                    Langkah {step} dari {totalSteps}
+                  <div className="inline-block text-[11px] font-semibold uppercase tracking-[0.08em] text-[#7b7b78]">
+                    Langkah {step} dari {totalSteps} — {stepLabels[step - 1]}
                   </div>
-                  <CardTitle className="text-[28px] font-medium text-[#1f1d1a] leading-[1.03] tracking-[-0.8px] sm:text-[42px] sm:tracking-[-1.2px] lg:text-[48px] lg:tracking-[-1.4px] dark:!text-[#1f1d1a]">
-                    Mulai proses scoring.
+                  <CardTitle className="max-w-3xl text-[28px] font-medium leading-[1.08] tracking-[-0.8px] text-[#111111] sm:text-[38px] sm:tracking-[-1px] lg:text-[44px] lg:tracking-[-1.2px]">
+                    {stepHeadings[step - 1]?.title ?? "Proses scoring"}
                   </CardTitle>
-                  <CardDescription className="text-[#5f5b54] text-[16px] font-normal leading-relaxed mt-2 pt-1 max-w-2xl dark:!text-[#5f5b54]">
-                    Lengkapi data bisnis Anda langkah demi langkah.
+                  <CardDescription className="mt-2 max-w-2xl pt-1 text-base font-normal leading-relaxed text-[#626260]">
+                    {stepHeadings[step - 1]?.description ??
+                      "Lengkapi data bisnis Anda langkah demi langkah."}
                   </CardDescription>
                 </div>
                 <div className="flex items-start gap-2 rounded-lg border border-[#cde7c3] bg-[#f4fbf1] px-4 py-3 text-sm text-[#2c6415]">
-                  <ShieldCheck className="mt-0.5 size-4 shrink-0" />
+                  <ShieldCheck className="mt-0.5 size-4 shrink-0" aria-hidden />
                   <p>
                     Data dipakai hanya untuk analisis skor dan tidak dibagikan
                     tanpa izin Anda.
@@ -230,11 +253,14 @@ const ScoringPageContent = () => {
               </CardHeader>
               <CardContent className="pt-7 px-4 sm:px-7 pb-7">
                 {submitCount > 0 && errorMessages.length > 0 ? (
-                  <div className="mb-8 border border-[#fe4c02] bg-[#fff4ee] p-5 text-sm text-[#fe4c02] rounded-lg">
-                    <p className="font-semibold uppercase tracking-[0.6px] text-[12px]">
+                  <div
+                    className="mb-8 rounded-lg border border-[#fe4c02] bg-[#fff4ee] p-5 text-sm text-[#fe4c02]"
+                    role="alert"
+                  >
+                    <p className="text-[12px] font-semibold uppercase tracking-[0.06em]">
                       Mohon perbaiki data berikut:
                     </p>
-                    <ul className="mt-3 list-disc pl-8 space-y-1 text-[#1f1d1a]">
+                    <ul className="mt-3 list-disc space-y-1 pl-8 text-[#111111]">
                       {errorMessages.map((message) => (
                         <li key={message}>{message}</li>
                       ))}
@@ -242,20 +268,23 @@ const ScoringPageContent = () => {
                   </div>
                 ) : null}
                 {submitError ? (
-                  <div className="mb-8 border border-[#fe4c02] bg-[#fff4ee] p-5 text-sm text-[#fe4c02] rounded-lg">
+                  <div
+                    className="mb-8 rounded-lg border border-[#fe4c02] bg-[#fff4ee] p-5 text-sm text-[#fe4c02]"
+                    role="alert"
+                  >
                     {submitError}
                   </div>
                 ) : null}
 
                 <div className="min-h-[240px]">{renderStep()}</div>
 
-                <div className="mt-8 flex flex-col-reverse items-stretch justify-between gap-4 border-t border-[#e2ddd6] pt-7 sm:flex-row sm:items-center">
+                <div className="mt-8 flex flex-col-reverse items-stretch justify-between gap-4 border-t border-[#dedbd6] pt-7 sm:flex-row sm:items-center">
                   <Button
                     type="button"
                     variant="outline"
                     onClick={prevStep}
                     disabled={step === 1}
-                    className="w-full sm:w-auto h-12 px-6 rounded-md border-[#2a2825] bg-transparent text-[#2a2825] hover:scale-[1.02] active:scale-95 hover:bg-[#faf7f2] transition-transform duration-300 disabled:opacity-30 disabled:hover:scale-100 font-medium text-[16px]"
+                    className="h-12 w-full rounded-md border-[#111111] bg-transparent px-6 text-base font-medium text-[#111111] transition-transform duration-300 hover:bg-[#fcfaf7] hover:scale-[1.02] active:scale-95 disabled:opacity-30 disabled:hover:scale-100 sm:w-auto"
                   >
                     Kembali
                   </Button>
@@ -289,22 +318,22 @@ const ScoringPageContent = () => {
 
           {/* Sidebar */}
           <aside className="order-1 lg:order-2 space-y-6 lg:sticky lg:top-24 lg:h-fit">
-            <Card className="hidden lg:block border-[#ddd7cf] bg-[#ffffff] rounded-xl shadow-sm dark:!border-[#ddd7cf] dark:!bg-[#ffffff] dark:!text-[#1f1d1a]">
-              <CardHeader className="pb-4 px-6 pt-6">
-                <CardTitle className="text-[11px] font-semibold text-[#2a2825] flex justify-between items-end uppercase tracking-[0.08em]">
+            <Card className="hidden rounded-xl border-[#dedbd6] bg-white shadow-sm lg:block">
+              <CardHeader className="px-6 pb-4 pt-6">
+                <CardTitle className="flex items-end justify-between text-[11px] font-semibold uppercase tracking-[0.08em] text-[#111111]">
                   Progress
-                  <span className="text-[28px] font-medium text-[#ff5600] tracking-[-0.6px] leading-none">
+                  <span className="text-[28px] font-medium leading-none tracking-[-0.6px] text-[#ff5600]">
                     {completionPercent}%
                   </span>
                 </CardTitle>
-                <div className="h-1.5 w-full bg-[#e5dfd8] mt-4 rounded-full overflow-hidden">
+                <div className="mt-4 h-1.5 w-full overflow-hidden rounded-full bg-[#efeae3]">
                   <div
                     className="h-full bg-[#ff5600] transition-all duration-300"
                     style={{ width: `${completionPercent}%` }}
                   />
                 </div>
               </CardHeader>
-              <CardContent className="space-y-2 pb-6 px-4">
+              <CardContent className="space-y-2 px-4 pb-6">
                 {stepLabels.map((label, index) => {
                   const stepNumber = index + 1;
                   const done = isStepComplete(stepNumber);
@@ -312,14 +341,14 @@ const ScoringPageContent = () => {
                   return (
                     <div
                       key={label}
-                      className={`flex items-center justify-between px-3 py-2 rounded-[6px] border border-transparent ${
+                      className={`flex items-center justify-between rounded-[6px] border border-transparent px-3 py-2 ${
                         active
-                          ? "bg-[#faf7f2] border-[#ddd7cf]"
+                          ? "border-[#dedbd6] bg-[#fcfaf7]"
                           : "bg-transparent"
                       }`}
                     >
                       <span
-                        className={`text-[14px] font-medium ${active ? "text-[#ff5600]" : done ? "text-[#2a2825]" : "text-[#6a655e]"}`}
+                        className={`text-[14px] font-medium ${active ? "text-[#ff5600]" : done ? "text-[#111111]" : "text-[#7b7b78]"}`}
                       >
                         {label}
                       </span>
@@ -335,19 +364,19 @@ const ScoringPageContent = () => {
             </Card>
 
             {/* Mobile Progress */}
-            <details className="lg:hidden group rounded-xl border border-[#ddd7cf] bg-[#ffffff] shadow-sm dark:!border-[#ddd7cf] dark:!bg-[#ffffff] dark:!text-[#1f1d1a]">
-              <summary className="cursor-pointer px-5 py-4 text-[11px] font-semibold uppercase tracking-[0.08em] text-[#2a2825] flex justify-between items-center outline-none list-none">
+            <details className="group rounded-xl border border-[#dedbd6] bg-white shadow-sm lg:hidden">
+              <summary className="flex cursor-pointer list-none items-center justify-between px-5 py-4 text-[11px] font-semibold uppercase tracking-[0.08em] text-[#111111] outline-none">
                 <div className="flex items-center gap-3">
-                  <div className="text-[#ff5600] font-medium tracking-[-0.48px] leading-none text-xl">
+                  <div className="text-xl font-medium leading-none tracking-[-0.48px] text-[#ff5600]">
                     {completionPercent}%
                   </div>
                   <span>Progress</span>
                 </div>
-                <div className="text-[#6a655e] group-open:rotate-180 transition-transform">
+                <div className="text-[#7b7b78] transition-transform group-open:rotate-180">
                   ▼
                 </div>
               </summary>
-              <div className="space-y-2 border-t border-[#e2ddd6] p-5 bg-[#faf7f2]">
+              <div className="space-y-2 border-t border-[#dedbd6] bg-[#fcfaf7] p-5">
                 {stepLabels.map((label, index) => {
                   const stepNumber = index + 1;
                   const done = isStepComplete(stepNumber);
@@ -355,12 +384,12 @@ const ScoringPageContent = () => {
                   return (
                     <div
                       key={label}
-                      className={`flex items-center justify-between px-3 py-2 rounded-[6px] ${
-                        active ? "bg-[#ffffff] border border-[#ddd7cf]" : ""
+                      className={`flex items-center justify-between rounded-[6px] px-3 py-2 ${
+                        active ? "border border-[#dedbd6] bg-white" : ""
                       }`}
                     >
                       <span
-                        className={`text-[14px] font-medium ${active ? "text-[#ff5600]" : done ? "text-[#2a2825]" : "text-[#6a655e]"}`}
+                        className={`text-[14px] font-medium ${active ? "text-[#ff5600]" : done ? "text-[#111111]" : "text-[#7b7b78]"}`}
                       >
                         {label}
                       </span>
@@ -383,8 +412,12 @@ const ScoringPageContent = () => {
 
 export default function ScoringPage() {
   return (
-    <div className="min-h-screen bg-[#f7f3ec] py-6 text-[#1f1d1a] font-sans lg:py-14 dark:!bg-[#f7f3ec] dark:!text-[#1f1d1a]">
-      <div className="mx-auto max-w-6xl px-4 sm:px-6 lg:px-8 relative z-10">
+    <div className="relative min-h-screen bg-[#faf9f6] py-8 font-sans text-[#111111] selection:bg-[#ffd8c2] sm:py-12 lg:py-14">
+      <div className="pointer-events-none absolute inset-0 overflow-hidden">
+        <div className="absolute -left-16 top-20 h-40 w-40 rounded-full bg-[#ff5600]/6 blur-3xl" />
+        <div className="absolute right-0 top-32 h-48 w-48 rounded-full bg-[#2c6415]/6 blur-3xl" />
+      </div>
+      <div className="relative z-10 mx-auto max-w-6xl px-4 sm:px-6 lg:px-8">
         <ScoringPageContent />
       </div>
     </div>

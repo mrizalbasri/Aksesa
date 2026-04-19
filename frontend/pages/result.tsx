@@ -1,4 +1,11 @@
-import React, { useEffect, useMemo, useState, type FormEvent } from "react";
+import React, {
+  useCallback,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+  type FormEvent,
+} from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import ScoreGauge from "@/components/scoring/ScoreGauge";
 import FactorBreakdown from "@/components/scoring/FactorBreakdown";
@@ -6,17 +13,9 @@ import RecommendationCard from "@/components/scoring/RecommendationCard";
 import ScoreHistory from "@/components/scoring/ScoreHistory";
 import LoanSimulator from "@/components/scoring/LoanSimulator";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
-import {
-  Download,
-  Share2,
-  Save,
-  ShieldCheck,
-  Lock,
-  X,
-  Loader2,
-} from "lucide-react";
+import { Download, Share2, Save, ShieldCheck, Lock } from "lucide-react";
+import { LoginPanel } from "@/components/auth/LoginPanel";
 import { generatePdfReport } from "@/lib/pdfGenerator";
 import {
   AUTH_CHANGED_EVENT,
@@ -27,6 +26,7 @@ import {
   exportResultPdf,
   getMe,
   login,
+  loginWithGoogle,
   shareResult,
 } from "@/lib/api";
 
@@ -107,6 +107,7 @@ const ResultPage = () => {
   const [actionSuccess, setActionSuccess] = useState<string | null>(null);
   const [isLoggingIn, setIsLoggingIn] = useState(false);
   const [isProcessingAction, setIsProcessingAction] = useState(false);
+  const loginEmailInputRef = useRef<HTMLInputElement | null>(null);
 
   const score = scoringResult?.score ?? 0;
   const hasScoringResult = scoringResult !== null;
@@ -306,10 +307,70 @@ const ResultPage = () => {
     void runProtectedAction(action);
   };
 
-  const closeLoginPrompt = () => {
+  const closeLoginPrompt = useCallback(() => {
     setShowLoginPrompt(false);
     setPendingAction(null);
     setLoginError(null);
+  }, []);
+
+  useEffect(() => {
+    if (!showLoginPrompt || typeof window === "undefined") {
+      return;
+    }
+
+    const focusTimer = window.setTimeout(() => {
+      loginEmailInputRef.current?.focus();
+    }, 0);
+
+    const handleEscape = (event: KeyboardEvent) => {
+      if (event.key === "Escape" && !isLoggingIn) {
+        closeLoginPrompt();
+      }
+    };
+
+    window.addEventListener("keydown", handleEscape);
+    return () => {
+      window.clearTimeout(focusTimer);
+      window.removeEventListener("keydown", handleEscape);
+    };
+  }, [showLoginPrompt, isLoggingIn, closeLoginPrompt]);
+
+  const googleClientId =
+    typeof process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID === "string"
+      ? process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID.trim()
+      : "";
+
+  const handleGoogleCredential = async (credential: string) => {
+    const actionToRun = pendingAction;
+    setLoginError(null);
+    setIsLoggingIn(true);
+    try {
+      const response = await loginWithGoogle(credential);
+      const token = response.access_token;
+
+      if (typeof window !== "undefined") {
+        window.sessionStorage.setItem(SESSION_AUTH_TOKEN_KEY, token);
+        window.dispatchEvent(new Event(AUTH_CHANGED_EVENT));
+      }
+
+      setAuthToken(token);
+      setIsLoggedIn(true);
+      setShowLoginPrompt(false);
+      setActionSuccess("Login berhasil. Aksi Anda langsung diproses.");
+      setLoginError(null);
+    } catch (error) {
+      const message =
+        error instanceof Error ? error.message : "Login Google gagal.";
+      setLoginError(message);
+      setIsLoggingIn(false);
+      return;
+    }
+
+    setIsLoggingIn(false);
+    setPendingAction(null);
+    if (actionToRun) {
+      void runProtectedAction(actionToRun);
+    }
   };
 
   const handleLoginSubmit = async (event: FormEvent<HTMLFormElement>) => {
@@ -360,12 +421,19 @@ const ResultPage = () => {
   };
 
   return (
-    <div className="min-h-screen bg-[#faf9f6] py-8 text-[#111111] sm:py-12">
-      <div className="mx-auto max-w-4xl px-4 sm:px-6 lg:px-8">
-        <div className="space-y-8">
-          <Card className="border-[#dedbd6] bg-white">
-            <CardHeader>
-              <CardTitle className="flex flex-col items-center gap-2 text-center text-2xl font-semibold text-[#111111]">
+    <div className="relative min-h-screen bg-[#faf9f6] py-8 font-sans text-[#111111] selection:bg-[#ffd8c2] sm:py-12 lg:py-14">
+      <div className="pointer-events-none absolute inset-0 overflow-hidden">
+        <div className="absolute -right-12 top-24 h-44 w-44 rounded-full bg-[#ff5600]/7 blur-3xl" />
+        <div className="absolute bottom-32 left-0 h-36 w-36 rounded-full bg-[#2c6415]/6 blur-3xl" />
+      </div>
+      <div className="relative z-10 mx-auto max-w-6xl px-4 sm:px-6 lg:px-8">
+        <div className="space-y-10">
+          <Card className="border-[#dedbd6] bg-white shadow-sm">
+            <CardHeader className="pb-2">
+              <p className="mb-2 text-center text-[11px] font-semibold uppercase tracking-[0.1em] text-[#7b7b78]">
+                Ringkasan hasil
+              </p>
+              <CardTitle className="flex flex-col items-center gap-2 text-center text-2xl font-semibold tracking-tight text-[#111111] sm:text-3xl">
                 Hasil Analisis Skor Kredit Anda
                 <Badge
                   className={
@@ -388,7 +456,7 @@ const ResultPage = () => {
                   </div>
                 ) : null}
                 <div className="mb-6 flex w-full items-start gap-2 rounded-lg border border-[#cde7c3] bg-[#f4fbf1] px-4 py-3 text-sm text-[#2c6415]">
-                  <ShieldCheck className="mt-0.5 size-4 shrink-0" />
+                  <ShieldCheck className="mt-0.5 size-4 shrink-0" aria-hidden />
                   <p>
                     {isLoggedIn
                       ? "Data hasil scoring Anda tersimpan aman di akun."
@@ -460,103 +528,76 @@ const ResultPage = () => {
             </CardContent>
           </Card>
 
-          <div className="grid grid-cols-1 gap-8 lg:grid-cols-2">
-            <FactorBreakdown factors={scoringResult?.factors} />
-            <RecommendationCard recommendations={scoringResult?.recommendations} />
-          </div>
+          <section
+            className="space-y-6"
+            aria-labelledby="result-detail-heading"
+          >
+            <h2
+              id="result-detail-heading"
+              className="border-b border-[#dedbd6] pb-2 text-sm font-medium uppercase tracking-[0.1em] text-[#7b7b78]"
+            >
+              Faktor &amp; rekomendasi
+            </h2>
+            <div className="grid grid-cols-1 gap-8 lg:grid-cols-2">
+              <FactorBreakdown factors={scoringResult?.factors} />
+              <RecommendationCard recommendations={scoringResult?.recommendations} />
+            </div>
+          </section>
 
-          <div className="grid grid-cols-1 gap-8 lg:grid-cols-2">
-            <ScoreHistory />
-            <LoanSimulator />
-          </div>
+          <section className="space-y-6" aria-labelledby="result-tools-heading">
+            <h2
+              id="result-tools-heading"
+              className="border-b border-[#dedbd6] pb-2 text-sm font-medium uppercase tracking-[0.1em] text-[#7b7b78]"
+            >
+              Simulasi &amp; riwayat
+            </h2>
+            <div className="grid grid-cols-1 gap-8 lg:grid-cols-2">
+              <LoanSimulator />
+              <ScoreHistory />
+            </div>
+          </section>
         </div>
       </div>
 
       {showLoginPrompt ? (
-        <div className="fixed inset-0 z-50 flex items-start justify-center bg-[#111111]/40 px-4 py-8 sm:items-center">
-          <Card className="w-full max-w-md border-[#dedbd6] bg-white">
-            <CardHeader>
-              <div className="flex items-start justify-between gap-3">
-                <div>
-                  <p className="text-xs font-semibold uppercase tracking-[0.08em] text-[#7b7b78]">
-                    Login Diperlukan
-                  </p>
-                  <CardTitle className="mt-2 text-xl text-[#111111]">
-                    Lanjutkan {pendingAction ? actionLabels[pendingAction] : "aksi"}
-                  </CardTitle>
-                </div>
-                <button
-                  type="button"
-                  aria-label="Tutup login prompt"
-                  onClick={closeLoginPrompt}
-                  className="rounded p-1 text-[#626260] transition-colors hover:bg-[#f5f4f1] hover:text-[#111111]"
-                >
-                  <X className="size-4" />
-                </button>
-              </div>
-            </CardHeader>
-            <CardContent>
-              <form className="space-y-4" onSubmit={handleLoginSubmit}>
-                <div className="space-y-2">
-                  <label
-                    className="text-sm font-medium text-[#111111]"
-                    htmlFor="login-email"
-                  >
-                    Email
-                  </label>
-                  <Input
-                    id="login-email"
-                    type="email"
-                    value={loginEmail}
-                    onChange={(event) => setLoginEmail(event.target.value)}
-                    placeholder="nama@bisnis.com"
-                    className="border-[#dedbd6] focus-visible:ring-[#111111]"
-                  />
-                </div>
-                <div className="space-y-2">
-                  <label
-                    className="text-sm font-medium text-[#111111]"
-                    htmlFor="login-password"
-                  >
-                    Password
-                  </label>
-                  <Input
-                    id="login-password"
-                    type="password"
-                    value={loginPassword}
-                    onChange={(event) => setLoginPassword(event.target.value)}
-                    placeholder="Minimal 8 karakter"
-                    className="border-[#dedbd6] focus-visible:ring-[#111111]"
-                  />
-                </div>
-                {loginError ? (
-                  <div className="rounded-lg border border-[#fe4c02] bg-[#fff4ee] px-3 py-2 text-sm text-[#fe4c02]">
-                    {loginError}
-                  </div>
-                ) : null}
-                <div className="flex justify-end gap-2 pt-2">
-                  <Button
-                    type="button"
-                    variant="outline"
-                    className="border-[#111111] text-[#111111] hover:bg-[#111111] hover:text-white"
-                    onClick={closeLoginPrompt}
-                  >
-                    Batal
-                  </Button>
-                  <Button
-                    type="submit"
-                    className="bg-[#2c6415] text-white hover:bg-[#245111]"
-                    disabled={isLoggingIn}
-                  >
-                    {isLoggingIn ? (
-                      <Loader2 className="mr-2 size-4 animate-spin" />
-                    ) : null}
-                    Masuk & Lanjutkan
-                  </Button>
-                </div>
-              </form>
-            </CardContent>
-          </Card>
+        <div
+          className="fixed inset-0 z-[60] flex items-start justify-center bg-[#111111]/50 px-4 py-8 backdrop-blur-[3px] sm:items-center"
+          onClick={(event) => {
+            if (event.currentTarget === event.target && !isLoggingIn) {
+              closeLoginPrompt();
+            }
+          }}
+          role="presentation"
+        >
+          <div
+            className="w-full max-w-md"
+            role="dialog"
+            aria-modal="true"
+            aria-labelledby="result-login-title"
+            onClick={(event) => event.stopPropagation()}
+          >
+            <LoginPanel
+              titleId="result-login-title"
+              eyebrow="Login"
+              title={`Lanjut: ${pendingAction ? actionLabels[pendingAction] : "aksi"}`}
+              subtitle="Sesudah masuk, aksi dijalankan otomatis."
+              emailId="result-login-email"
+              passwordId="result-login-password"
+              emailRef={loginEmailInputRef}
+              email={loginEmail}
+              password={loginPassword}
+              onEmailChange={setLoginEmail}
+              onPasswordChange={setLoginPassword}
+              error={loginError}
+              isSubmitting={isLoggingIn}
+              onSubmit={handleLoginSubmit}
+              onClose={closeLoginPrompt}
+              closeDisabled={isLoggingIn}
+              submitLabel="Masuk & lanjutkan"
+              googleClientId={googleClientId}
+              onGoogleCredential={handleGoogleCredential}
+            />
+          </div>
         </div>
       ) : null}
     </div>

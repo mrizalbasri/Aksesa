@@ -6,6 +6,10 @@ class LoginRequest(BaseModel):
     password: str = Field(min_length=8, max_length=128)
 
 
+class GoogleLoginRequest(BaseModel):
+    credential: str = Field(min_length=20, max_length=12000)
+
+
 class UserResponse(BaseModel):
     id: str
     email: str = Field(pattern=r".+@.+\..+")

@@ -1,15 +1,15 @@
 import React, { useEffect, useRef, useState, type FormEvent } from "react";
 import Link from "next/link";
-import { X, Loader2, Menu as MenuIcon } from "lucide-react";
+import { Menu as MenuIcon } from "lucide-react";
 import { animated, to, useTransition } from "@react-spring/web";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
+import { LoginPanel } from "@/components/auth/LoginPanel";
 import {
   AUTH_CHANGED_EVENT,
   SESSION_AUTH_TOKEN_KEY,
   getMe,
   login,
+  loginWithGoogle,
 } from "@/lib/api";
 import { usePrefersReducedMotion } from "@/lib/usePrefersReducedMotion";
 
@@ -105,6 +105,38 @@ const Navbar = () => {
       window.removeEventListener("keydown", handleEscape);
     };
   }, [showLoginPrompt, isLoggingIn]);
+
+  const googleClientId =
+    typeof process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID === "string"
+      ? process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID.trim()
+      : "";
+
+  const handleGoogleCredential = async (credential: string) => {
+    setLoginError(null);
+    setIsLoggingIn(true);
+    try {
+      const response = await loginWithGoogle(credential);
+      if (typeof window !== "undefined") {
+        window.sessionStorage.setItem(
+          SESSION_AUTH_TOKEN_KEY,
+          response.access_token,
+        );
+        window.dispatchEvent(new Event(AUTH_CHANGED_EVENT));
+      }
+      setIsLoggedIn(true);
+      setShowLoginPrompt(false);
+      setLoginEmail("");
+      setLoginPassword("");
+    } catch (error) {
+      const message =
+        error instanceof Error
+          ? error.message
+          : "Login Google gagal. Coba lagi.";
+      setLoginError(message);
+    } finally {
+      setIsLoggingIn(false);
+    }
+  };
 
   const handleLoginSubmit = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
@@ -260,12 +292,13 @@ const Navbar = () => {
         visible ? (
           <animated.div
             style={{ opacity: style.opacity }}
-            className="fixed inset-0 z-[60] flex items-start justify-center bg-[#111111]/45 px-4 py-8 backdrop-blur-[2px] sm:items-center"
+            className="fixed inset-0 z-[60] flex items-start justify-center bg-[#111111]/50 px-4 py-8 backdrop-blur-[3px] sm:items-center"
             onClick={(event) => {
               if (event.currentTarget === event.target && !isLoggingIn) {
                 closeLoginPrompt();
               }
             }}
+            role="presentation"
           >
             <animated.div
               style={{
@@ -275,96 +308,30 @@ const Navbar = () => {
                 ),
               }}
               className="w-full max-w-md"
+              role="dialog"
+              aria-modal="true"
+              aria-labelledby="navbar-login-title"
             >
-              <Card className="rounded-2xl border-[#dedbd6] bg-white shadow-[0_16px_48px_rgba(17,17,17,0.18)]">
-            <CardHeader className="space-y-4 pb-4">
-              <div className="flex items-start justify-between gap-3">
-                <div>
-                  <p className="text-xs font-semibold uppercase tracking-[0.08em] text-[#6d6861]">
-                    Akses Aman
-                  </p>
-                  <CardTitle className="mt-2 text-[26px] leading-tight text-[#111111]">
-                    Masuk ke Akun Aksesa
-                  </CardTitle>
-                  <p className="mt-2 text-sm leading-relaxed text-[#626260]">
-                    Login untuk menyimpan, membagikan, dan mengunduh hasil scoring.
-                  </p>
-                </div>
-                <button
-                  type="button"
-                  aria-label="Tutup login prompt"
-                  onClick={closeLoginPrompt}
-                  className="rounded-md p-2 text-[#626260] transition-colors hover:bg-[#f5f4f1] hover:text-[#111111] disabled:cursor-not-allowed disabled:opacity-40"
-                  disabled={isLoggingIn}
-                >
-                  <X className="size-4" />
-                </button>
-              </div>
-            </CardHeader>
-            <CardContent className="pt-0">
-              <form className="space-y-5" onSubmit={handleLoginSubmit}>
-                <div className="space-y-2.5">
-                  <label
-                    className="text-sm font-medium text-[#111111]"
-                    htmlFor="header-login-email"
-                  >
-                    Email
-                  </label>
-                  <Input
-                    id="header-login-email"
-                    type="email"
-                    ref={emailInputRef}
-                    value={loginEmail}
-                    onChange={(event) => setLoginEmail(event.target.value)}
-                    placeholder="nama@bisnis.com"
-                    className="h-11 border-[#d9d4cd] bg-[#fffdf9] text-[15px] placeholder:text-[#979289] focus-visible:ring-[#111111]"
-                  />
-                </div>
-                <div className="space-y-2.5">
-                  <label
-                    className="text-sm font-medium text-[#111111]"
-                    htmlFor="header-login-password"
-                  >
-                    Password
-                  </label>
-                  <Input
-                    id="header-login-password"
-                    type="password"
-                    value={loginPassword}
-                    onChange={(event) => setLoginPassword(event.target.value)}
-                    placeholder="Minimal 8 karakter"
-                    className="h-11 border-[#d9d4cd] bg-[#fffdf9] text-[15px] placeholder:text-[#979289] focus-visible:ring-[#111111]"
-                  />
-                </div>
-                {loginError ? (
-                  <div className="rounded-lg border border-[#f9c7ad] bg-[#fff8f4] px-3 py-2.5 text-sm text-[#c94f1b]">
-                    {loginError}
-                  </div>
-                ) : null}
-                <div className="border-t border-[#ebe6de] pt-4">
-                  <Button
-                    type="submit"
-                    className="h-11 w-full bg-[#2c6415] text-white hover:bg-[#245111]"
-                    disabled={isLoggingIn}
-                  >
-                    {isLoggingIn ? (
-                      <Loader2 className="mr-2 size-4 animate-spin" />
-                    ) : null}
-                    Masuk
-                  </Button>
-                  <Button
-                    type="button"
-                    variant="ghost"
-                    className="mt-1 h-10 w-full text-[#66625b] hover:bg-[#f5f4f1] hover:text-[#111111]"
-                    onClick={closeLoginPrompt}
-                    disabled={isLoggingIn}
-                  >
-                    Batal
-                  </Button>
-                </div>
-              </form>
-            </CardContent>
-              </Card>
+              <LoginPanel
+                titleId="navbar-login-title"
+                eyebrow="Login"
+                title="Akun Aksesa"
+                emailId="header-login-email"
+                passwordId="header-login-password"
+                emailRef={emailInputRef}
+                email={loginEmail}
+                password={loginPassword}
+                onEmailChange={setLoginEmail}
+                onPasswordChange={setLoginPassword}
+                error={loginError}
+                isSubmitting={isLoggingIn}
+                onSubmit={handleLoginSubmit}
+                onClose={closeLoginPrompt}
+                closeDisabled={isLoggingIn}
+                submitLabel="Masuk"
+                googleClientId={googleClientId}
+                onGoogleCredential={handleGoogleCredential}
+              />
             </animated.div>
           </animated.div>
         ) : null,

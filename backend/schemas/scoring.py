@@ -43,3 +43,22 @@ class LoanSimulationResponse(BaseModel):
     monthly_interest_rate: float
     estimated_monthly_payment: float
 
+
+class ScoringHistoryItem(BaseModel):
+    id: str
+    score: int
+    risk_category: str
+    created_at: str
+
+
+class ScoringHistoryResponse(BaseModel):
+    items: list[ScoringHistoryItem]
+    total: int
+
+
+class DocumentUploadResponse(BaseModel):
+    filename: str
+    url: str
+    size_bytes: int
+    content_type: str
+

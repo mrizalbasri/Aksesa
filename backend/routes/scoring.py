@@ -1,13 +1,21 @@
-from fastapi import APIRouter, File, UploadFile
+from fastapi import APIRouter, Depends, File, Query, UploadFile
 
+from routes.responses import service_error_response
 from schemas.scoring import (
     DocumentOcrResponse,
+    DocumentUploadResponse,
     LoanSimulationRequest,
     LoanSimulationResponse,
+    ScoringHistoryResponse,
     ScoringRequest,
     ScoringResponse,
 )
+from services.auth_service import AuthUser, get_current_user
+from services.azure_blob import upload_document
+from services.azure_docintel import extract_text_only
+from services.azure_openai import generate_recommendations
 from services.errors import ServiceError
+from services.scoring_history_service import add_to_history, get_user_history
 
 router = APIRouter(prefix="/api/v1", tags=["Scoring"])
 
@@ -24,7 +32,10 @@ def _risk_category(score: int) -> str:
 
 
 @router.post("/scoring", response_model=ScoringResponse)
-async def calculate_score(payload: ScoringRequest) -> ScoringResponse:
+async def calculate_score(
+    payload: ScoringRequest,
+    user: AuthUser | None = Depends(get_current_user),
+) -> ScoringResponse:
     score = 35
     factors: list[str] = []
 
@@ -59,20 +70,10 @@ async def calculate_score(payload: ScoringRequest) -> ScoringResponse:
     score = max(0, min(score, 100))
     category = _risk_category(score)
 
-    recommendations = [
-        "Pertahankan pencatatan transaksi harian agar evaluasi skor lebih akurat.",
-        "Pisahkan rekening bisnis dan pribadi untuk meningkatkan kepercayaan data.",
-    ]
-    if category == "high":
-        recommendations.insert(
-            0, "Fokus menaikkan konsistensi transaksi selama 2-3 bulan ke depan."
-        )
-    elif category == "medium":
-        recommendations.insert(
-            0, "Tingkatkan bukti pendapatan rutin untuk mendorong skor ke kategori layak."
-        )
-    else:
-        recommendations.insert(0, "Profil bisnis Anda sudah kuat, lanjutkan disiplin pembayaran.")
+    recommendations = generate_recommendations(payload, score, category, factors)
+
+    if user:
+        add_to_history(user, score, category)
 
     return ScoringResponse(
         score=score,
@@ -99,14 +100,65 @@ async def process_document(file: UploadFile = File(...)):
             status_code=413,
         )
 
-    extracted_text = (
-        "OCR placeholder: invoice terbaca, integrasi Azure Document Intelligence "
-        "akan diaktifkan pada fase berikutnya."
-    )
+    try:
+        extracted_text = extract_text_only(content)
+    except ServiceError:
+        raise
+    except Exception as exc:
+        raise ServiceError(
+            code="OCR_FAILED",
+            message="Gagal memproses dokumen invoice.",
+            status_code=500,
+        ) from exc
+
     return DocumentOcrResponse(
         file_name=file.filename or "document",
         status="processed",
         extracted_text=extracted_text,
+    )
+
+
+@router.post("/documents/upload", response_model=DocumentUploadResponse)
+async def upload_doc(
+    file: UploadFile = File(...),
+    user: AuthUser = Depends(get_current_user),
+):
+    if file.content_type not in SUPPORTED_IMAGE_TYPES:
+        raise ServiceError(
+            code="ACTION_FAILED",
+            message="Format file harus JPEG atau PNG.",
+            status_code=400,
+        )
+
+    content = await file.read()
+    if len(content) > MAX_INVOICE_FILE_SIZE_BYTES:
+        raise ServiceError(
+            code="ACTION_FAILED",
+            message="Ukuran file maksimum 5 MB.",
+            status_code=413,
+        )
+
+    try:
+        result = upload_document(
+            file_bytes=content,
+            original_filename=file.filename or "document",
+            content_type=file.content_type,
+            user_id=user.id,
+        )
+    except ServiceError:
+        raise
+    except Exception as exc:
+        raise ServiceError(
+            code="UPLOAD_FAILED",
+            message="Gagal upload dokumen.",
+            status_code=500,
+        ) from exc
+
+    return DocumentUploadResponse(
+        filename=result["filename"],
+        url=result["url"],
+        size_bytes=result["size_bytes"],
+        content_type=result["content_type"],
     )
 
 
@@ -130,4 +182,13 @@ async def simulate_loan(payload: LoanSimulationRequest) -> LoanSimulationRespons
         monthly_interest_rate=monthly_interest_rate,
         estimated_monthly_payment=round(monthly_payment, 2),
     )
+
+
+@router.get("/scoring/history", response_model=ScoringHistoryResponse)
+async def get_scoring_history(
+    limit: int = Query(default=20, ge=1, le=100),
+    offset: int = Query(default=0, ge=0),
+    user: AuthUser = Depends(get_current_user),
+):
+    return get_user_history(user, limit=limit, offset=offset)
 

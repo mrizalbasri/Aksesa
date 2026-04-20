@@ -1,4 +1,6 @@
 import React, { useState } from "react";
+import { motion, useInView, AnimatePresence } from "framer-motion";
+import { useRef } from "react";
 import LandingHero from "./LandingHero";
 import FeatureCard from "./FeatureCard";
 import Footer from "./Footer";
@@ -21,8 +23,54 @@ type LandingFeature = {
   icon: LucideIcon;
 };
 
+const featureVariants = {
+  hidden: { opacity: 0, y: 40 },
+  visible: (i: number) => ({
+    opacity: 1,
+    y: 0,
+    transition: {
+      delay: i * 0.1,
+      duration: 0.5,
+      ease: "easeOut",
+    },
+  }),
+};
+
+const securityVariants = {
+  hidden: { opacity: 0, y: 30 },
+  visible: (i: number) => ({
+    opacity: 1,
+    y: 0,
+    transition: {
+      delay: i * 0.08,
+      duration: 0.4,
+      ease: "easeOut",
+    },
+  }),
+};
+
+const faqVariants = {
+  hidden: { opacity: 0, x: -20 },
+  visible: (i: number) => ({
+    opacity: 1,
+    x: 0,
+    transition: {
+      delay: i * 0.05,
+      duration: 0.3,
+    },
+  }),
+};
+
 const LandingPage = () => {
-  const [openFaqIndex, setOpenFaqIndex] = useState<number | null>(0);
+  const [openFaqIndex, setOpenFaqIndex] = useState<number | null>(null);
+  const featuresRef = useRef(null);
+  const securityRef = useRef(null);
+  const faqRef = useRef(null);
+
+  const featuresInView = useInView(featuresRef, { once: true, amount: 0.2 });
+  const securityInView = useInView(securityRef, { once: true, amount: 0.2 });
+  const faqInView = useInView(faqRef, { once: true, amount: 0.2 });
+
   const features: LandingFeature[] = [
     {
       title: "Input Data Fleksibel",
@@ -95,6 +143,7 @@ const LandingPage = () => {
 
       <section
         id="fitur"
+        ref={featuresRef}
         className="relative mx-auto max-w-6xl overflow-hidden border-t border-[#dedbd6] bg-[#fdfbf8] px-4 py-20 sm:px-6 lg:px-8"
       >
         <div className="pointer-events-none absolute inset-0">
@@ -103,7 +152,12 @@ const LandingPage = () => {
         </div>
 
         <div className="relative z-10">
-          <div className="mb-16 flex flex-col items-start justify-between gap-6 md:flex-row md:items-end">
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={featuresInView ? { opacity: 1, y: 0 } : {}}
+            transition={{ duration: 0.5 }}
+            className="mb-16 flex flex-col items-start justify-between gap-6 md:flex-row md:items-end"
+          >
             <div className="max-w-xl">
               <h2 className="mb-3 inline-block border-b border-[#dedbd6] pb-1 text-sm font-medium uppercase tracking-[0.1em] text-[#7b7b78]">
                 Kapabilitas Sistem
@@ -117,16 +171,23 @@ const LandingPage = () => {
               Didesain tanpa kosmetik berlebih. Setiap fitur adalah fungsi
               faktual yang menjembatani UMKM dengan kepercayaan institusi.
             </p>
-          </div>
+          </motion.div>
 
           <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-4">
             {features.map((feature, index) => (
-              <FeatureCard
+              <motion.div
                 key={index}
-                title={feature.title}
-                description={feature.description}
-                icon={feature.icon || BadgeCent} // fallback
-              />
+                custom={index}
+                initial="hidden"
+                animate={featuresInView ? "visible" : "hidden"}
+                variants={featureVariants}
+              >
+                <FeatureCard
+                  title={feature.title}
+                  description={feature.description}
+                  icon={feature.icon || BadgeCent}
+                />
+              </motion.div>
             ))}
           </div>
         </div>
@@ -134,6 +195,7 @@ const LandingPage = () => {
 
       <section
         id="keamanan-data"
+        ref={securityRef}
         className="relative mx-auto max-w-6xl overflow-hidden border-t border-[#dedbd6] bg-[#fffdf9] px-4 py-20 sm:px-6 lg:px-8"
       >
         <div className="pointer-events-none absolute inset-0">
@@ -142,7 +204,12 @@ const LandingPage = () => {
         </div>
 
         <div className="relative z-10">
-          <div className="mb-12 flex flex-col gap-6">
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={securityInView ? { opacity: 1, y: 0 } : {}}
+            transition={{ duration: 0.5 }}
+            className="mb-12 flex flex-col gap-6"
+          >
             <div className="max-w-2xl">
               <h2 className="mb-3 inline-block border-b border-[#dedbd6] pb-1 text-sm font-medium uppercase tracking-[0.1em] text-[#7b7b78]">
                 Keamanan Data
@@ -158,16 +225,21 @@ const LandingPage = () => {
                 Bukti Keamanan Aktif
               </div>
             </div>
-          </div>
+          </motion.div>
 
           <div className="grid grid-cols-1 gap-4 md:grid-cols-3">
-            {securityHighlights.map((item) => {
+            {securityHighlights.map((item, index) => {
               const Icon = item.icon || BadgeCent;
 
               return (
-                <article
+                <motion.article
                   key={item.title}
-                  className="rounded-lg border border-[#dedbd6] bg-white p-6 transition-all duration-200 ease-out hover:-translate-y-1 hover:border-[#2c6415] hover:shadow-[0_14px_30px_rgba(17,17,17,0.1)] motion-reduce:transform-none motion-reduce:transition-none motion-reduce:hover:shadow-none"
+                  custom={index}
+                  initial="hidden"
+                  animate={securityInView ? "visible" : "hidden"}
+                  variants={securityVariants}
+                  whileHover={{ y: -6, transition: { duration: 0.2 } }}
+                  className="rounded-lg border border-[#dedbd6] bg-white p-6"
                 >
                   <Icon className="mb-4 size-5 text-[#2c6415]" />
                   <h4 className="text-lg font-semibold text-[#111111]">
@@ -176,28 +248,36 @@ const LandingPage = () => {
                   <p className="mt-2 text-sm leading-relaxed text-[#626260]">
                     {item.description}
                   </p>
-                </article>
+                </motion.article>
               );
             })}
           </div>
         </div>
       </section>
 
-      <section className="relative mx-auto max-w-6xl overflow-hidden border-t border-[#dedbd6] bg-[#fcfaf7] px-4 py-20 sm:px-6 lg:px-8">
+      <section
+        ref={faqRef}
+        className="relative mx-auto max-w-6xl overflow-hidden border-t border-[#dedbd6] bg-[#fcfaf7] px-4 py-20 sm:px-6 lg:px-8"
+      >
         <div className="pointer-events-none absolute inset-0">
           <div className="absolute right-8 top-10 h-28 w-28 rounded-full bg-[#ff5600]/6 blur-3xl" />
           <div className="absolute -left-8 bottom-10 h-24 w-24 rounded-full bg-[#d7cec3]/45 blur-3xl" />
         </div>
 
         <div className="relative z-10">
-          <div className="mb-12 max-w-2xl">
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={faqInView ? { opacity: 1, y: 0 } : {}}
+            transition={{ duration: 0.5 }}
+            className="mb-12 max-w-2xl"
+          >
             <h2 className="mb-3 inline-block border-b border-[#dedbd6] pb-1 text-sm font-medium uppercase tracking-[0.1em] text-[#7b7b78]">
               FAQ Singkat
             </h2>
             <h3 className="text-4xl leading-tight text-[#111111] md:text-5xl">
               Pertanyaan yang sering ditanyakan
             </h3>
-          </div>
+          </motion.div>
 
           <div className="space-y-4">
             {faqs.map((faq, index) => {
@@ -206,9 +286,13 @@ const LandingPage = () => {
               const buttonId = `faq-trigger-${index}`;
 
               return (
-                <article
+                <motion.article
                   key={faq.question}
-                  className={`rounded-lg border bg-white p-5 transition-colors duration-200 ${
+                  custom={index}
+                  initial="hidden"
+                  animate={faqInView ? "visible" : "hidden"}
+                  variants={faqVariants}
+                  className={`overflow-hidden rounded-lg border bg-white transition-colors duration-200 ${
                     isOpen ? "border-[#ff5600]" : "border-[#dedbd6]"
                   }`}
                 >
@@ -222,34 +306,35 @@ const LandingPage = () => {
                         current === index ? null : index,
                       )
                     }
-                    className="flex w-full items-center justify-between gap-3 text-left"
+                    className="flex w-full items-center justify-between gap-3 px-5 py-4 text-left"
                   >
                     <span className="text-base font-medium text-[#111111]">
                       {faq.question}
                     </span>
-                    <ChevronDown
-                      className={`size-4 shrink-0 text-[#626260] transition-transform duration-200 motion-reduce:transition-none ${
-                        isOpen ? "rotate-180" : "rotate-0"
-                      }`}
-                    />
+                    <motion.div
+                      animate={{ rotate: isOpen ? 180 : 0 }}
+                      transition={{ duration: 0.2 }}
+                    >
+                      <ChevronDown className="size-4 shrink-0 text-[#626260]" />
+                    </motion.div>
                   </button>
-                  <div
-                    id={panelId}
-                    role="region"
-                    aria-labelledby={buttonId}
-                    className={`grid overflow-hidden transition-[grid-template-rows,opacity,margin] duration-200 ease-out motion-reduce:transition-none ${
-                      isOpen
-                        ? "mt-3 grid-rows-[1fr] opacity-100"
-                        : "mt-0 grid-rows-[0fr] opacity-0"
-                    }`}
-                  >
-                    <div className="min-h-0">
-                      <p className="text-sm leading-relaxed text-[#626260]">
-                        {faq.answer}
-                      </p>
-                    </div>
-                  </div>
-                </article>
+                  <AnimatePresence>
+                    {isOpen && (
+                      <motion.div
+                        initial={{ height: 0, opacity: 0 }}
+                        animate={{ height: "auto", opacity: 1 }}
+                        exit={{ height: 0, opacity: 0 }}
+                        transition={{ duration: 0.3, ease: "easeInOut" }}
+                      >
+                        <div className="px-5 pb-4">
+                          <p className="text-sm leading-relaxed text-[#626260]">
+                            {faq.answer}
+                          </p>
+                        </div>
+                      </motion.div>
+                    )}
+                  </AnimatePresence>
+                </motion.article>
               );
             })}
           </div>

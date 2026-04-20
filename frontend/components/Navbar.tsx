@@ -1,7 +1,7 @@
 import React, { useEffect, useRef, useState, type FormEvent } from "react";
 import Link from "next/link";
 import { Menu as MenuIcon } from "lucide-react";
-import { animated, to, useTransition } from "@react-spring/web";
+import { motion, AnimatePresence } from "framer-motion";
 import { Button } from "@/components/ui/button";
 import { LoginPanel } from "@/components/auth/LoginPanel";
 import {
@@ -11,7 +11,6 @@ import {
   login,
   loginWithGoogle,
 } from "@/lib/api";
-import { usePrefersReducedMotion } from "@/lib/usePrefersReducedMotion";
 
 const Navbar = () => {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
@@ -21,14 +20,6 @@ const Navbar = () => {
   const [loginError, setLoginError] = useState<string | null>(null);
   const [isLoggingIn, setIsLoggingIn] = useState(false);
   const emailInputRef = useRef<HTMLInputElement | null>(null);
-  const prefersReducedMotion = usePrefersReducedMotion();
-  const modalTransitions = useTransition(showLoginPrompt, {
-    from: { opacity: 0, y: 10, scale: 0.985 },
-    enter: { opacity: 1, y: 0, scale: 1 },
-    leave: { opacity: 0, y: 8, scale: 0.99 },
-    config: { tension: 250, friction: 24 },
-    immediate: prefersReducedMotion,
-  });
 
   useEffect(() => {
     if (typeof window === "undefined") {
@@ -288,10 +279,13 @@ const Navbar = () => {
         </div>
       </header>
 
-      {modalTransitions((style, visible) =>
-        visible ? (
-          <animated.div
-            style={{ opacity: style.opacity }}
+      <AnimatePresence>
+        {showLoginPrompt && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 0.2 }}
             className="fixed inset-0 z-[60] flex items-start justify-center bg-[#111111]/50 px-4 py-8 backdrop-blur-[3px] sm:items-center"
             onClick={(event) => {
               if (event.currentTarget === event.target && !isLoggingIn) {
@@ -300,13 +294,11 @@ const Navbar = () => {
             }}
             role="presentation"
           >
-            <animated.div
-              style={{
-                transform: to(
-                  [style.y, style.scale],
-                  (y, scale) => `translateY(${y}px) scale(${scale})`,
-                ),
-              }}
+            <motion.div
+              initial={{ opacity: 0, y: 10, scale: 0.985 }}
+              animate={{ opacity: 1, y: 0, scale: 1 }}
+              exit={{ opacity: 0, y: 8, scale: 0.99 }}
+              transition={{ duration: 0.2, ease: "easeOut" }}
               className="w-full max-w-md"
               role="dialog"
               aria-modal="true"
@@ -332,10 +324,10 @@ const Navbar = () => {
                 googleClientId={googleClientId}
                 onGoogleCredential={handleGoogleCredential}
               />
-            </animated.div>
-          </animated.div>
-        ) : null,
-      )}
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
     </>
   );
 };

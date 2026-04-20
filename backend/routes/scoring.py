@@ -1,11 +1,18 @@
 from fastapi import APIRouter, Depends, File, Query, UploadFile
 
+from database.dependencies import DbSession
+from database.models import RiskCategory
+from database.repositories import (
+    create_scoring_result,
+    get_user_scoring_history,
+)
 from routes.responses import service_error_response
 from schemas.scoring import (
     DocumentOcrResponse,
     DocumentUploadResponse,
     LoanSimulationRequest,
     LoanSimulationResponse,
+    ScoringHistoryItem,
     ScoringHistoryResponse,
     ScoringRequest,
     ScoringResponse,
@@ -15,7 +22,6 @@ from services.azure_blob import upload_document
 from services.azure_docintel import extract_text_only
 from services.azure_openai import generate_recommendations
 from services.errors import ServiceError
-from services.scoring_history_service import add_to_history, get_user_history
 
 router = APIRouter(prefix="/api/v1", tags=["Scoring"])
 
@@ -34,6 +40,7 @@ def _risk_category(score: int) -> str:
 @router.post("/scoring", response_model=ScoringResponse)
 async def calculate_score(
     payload: ScoringRequest,
+    db: DbSession,
     user: AuthUser | None = Depends(get_current_user),
 ) -> ScoringResponse:
     score = 35
@@ -73,7 +80,20 @@ async def calculate_score(
     recommendations = generate_recommendations(payload, score, category, factors)
 
     if user:
-        add_to_history(user, score, category)
+        try:
+            risk_cat = RiskCategory(category)
+            tx_data = [{"date": t.date, "amount": t.amount} for t in payload.transactions]
+            await create_scoring_result(
+                db,
+                user_id=user.id,
+                score=score,
+                risk_category=risk_cat,
+                factors=factors,
+                recommendations=recommendations,
+                transactions=tx_data,
+            )
+        except Exception:
+            pass
 
     return ScoringResponse(
         score=score,
@@ -120,6 +140,7 @@ async def process_document(file: UploadFile = File(...)):
 
 @router.post("/documents/upload", response_model=DocumentUploadResponse)
 async def upload_doc(
+    db: DbSession,
     file: UploadFile = File(...),
     user: AuthUser = Depends(get_current_user),
 ):
@@ -186,9 +207,22 @@ async def simulate_loan(payload: LoanSimulationRequest) -> LoanSimulationRespons
 
 @router.get("/scoring/history", response_model=ScoringHistoryResponse)
 async def get_scoring_history(
+    db: DbSession,
+    user: AuthUser = Depends(get_current_user),
     limit: int = Query(default=20, ge=1, le=100),
     offset: int = Query(default=0, ge=0),
-    user: AuthUser = Depends(get_current_user),
 ):
-    return get_user_history(user, limit=limit, offset=offset)
+    items, total = await get_user_scoring_history(db, user.id, limit=limit, offset=offset)
+    return ScoringHistoryResponse(
+        items=[
+            ScoringHistoryItem(
+                id=r.id,
+                score=r.score,
+                risk_category=r.risk_category.value,
+                created_at=r.created_at.isoformat(),
+            )
+            for r in items
+        ],
+        total=total,
+    )
 

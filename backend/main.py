@@ -11,6 +11,7 @@ from fastapi import FastAPI, Request
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
 
+from database import close_db, init_db
 from routes.auth import router as auth_router
 from routes.results import router as results_router
 from routes.scoring import router as scoring_router
@@ -46,6 +47,17 @@ def create_app() -> FastAPI:
         description="AI-powered credit scoring for Indonesian SMEs",
         version="1.1.0",
     )
+
+    @app.on_event("startup")
+    async def startup_event():
+        try:
+            await init_db()
+        except Exception:
+            pass
+
+    @app.on_event("shutdown")
+    async def shutdown_event():
+        await close_db()
 
     origins = parse_allowed_origins(os.getenv("ALLOWED_ORIGINS"))
     app.add_middleware(

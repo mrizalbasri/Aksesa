@@ -49,13 +49,15 @@ def get_engine():
     global _engine
     if _engine is None:
         database_url = _get_database_url()
-        _engine = create_async_engine(
-            database_url,
-            echo=os.getenv("DB_ECHO", "false").strip().lower() == "true",
-            pool_pre_ping=True,
-            pool_size=10,
-            max_overflow=20,
-        )
+        db_type = os.getenv("DB_TYPE", "mysql").strip().lower()
+        engine_args: dict = {
+            "echo": os.getenv("DB_ECHO", "false").strip().lower() == "true",
+            "pool_pre_ping": True,
+        }
+        if db_type != "sqlite":
+            engine_args.update({"pool_size": 10, "max_overflow": 20})
+
+        _engine = create_async_engine(database_url, **engine_args)
     return _engine
 
 

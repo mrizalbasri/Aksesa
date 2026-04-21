@@ -20,7 +20,7 @@ from schemas.scoring import (
 from services.auth_service import AuthUser, get_current_user
 from services.azure_blob import upload_document
 from services.azure_docintel import extract_text_only
-from services.azure_openai import generate_recommendations
+from services.ai_service import generate_recommendations
 from services.errors import ServiceError
 
 router = APIRouter(prefix="/api/v1", tags=["Scoring"])

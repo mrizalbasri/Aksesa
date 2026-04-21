@@ -6,10 +6,8 @@ import {
   useForm,
   type FieldErrors,
   type UseFormReturn,
-  type UseFormProps,
   FormProvider,
 } from "react-hook-form";
-import { type z } from "zod";
 
 import { scoringFormSchema, type ScoringFormValues } from "@/lib/validators";
 
@@ -23,7 +21,7 @@ const ScoringFormContext = createContext<ScoringFormContextValue | null>(null);
 
 export function ScoringFormProvider({ children }: { children: ReactNode }) {
   const form = useForm<ScoringFormValues>({
-    resolver: zodResolver(scoringFormSchema) as any,
+    resolver: zodResolver(scoringFormSchema),
     defaultValues: {
       file: undefined,
       transactions: [{ date: "", amount: 0 }],

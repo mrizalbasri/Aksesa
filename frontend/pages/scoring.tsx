@@ -23,7 +23,6 @@ import MarketplaceForm from "@/components/scoring/MarketplaceForm";
 import BusinessProfileForm from "@/components/scoring/BusinessProfileForm";
 import { Button } from "@/components/ui/button";
 import {
-  ArrowLeft,
   ArrowRight,
   CircleDot,
   Loader2,
@@ -100,7 +99,7 @@ const ScoringPageContent = () => {
   const router = useRouter();
 
   const methods = useForm<ScoringFormValues>({
-    resolver: zodResolver(scoringFormSchema) as any,
+    resolver: zodResolver(scoringFormSchema),
     defaultValues: {
       file: undefined,
       transactions: [{ date: "", amount: 0 }],

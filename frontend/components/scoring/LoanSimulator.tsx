@@ -6,7 +6,7 @@ import { Button } from "@/components/ui/button";
 const LoanSimulator = () => {
   const [amount, setAmount] = useState<number>(10000000);
   const [tenor, setTenor] = useState<number>(12); // in months
-  const [interestRate, setInterestRate] = useState<number>(1.5); // assumed 1.5% flat monthly interest
+  const [interestRate] = useState<number>(1.5); // assumed 1.5% flat monthly interest
   const [monthlyPayment, setMonthlyPayment] = useState<number>(0);
 
   const calculateLoan = () => {

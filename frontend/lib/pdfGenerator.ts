@@ -1,5 +1,4 @@
 import jsPDF from "jspdf";
-import { saveAs } from "file-saver";
 
 interface ReportData {
   score: number;

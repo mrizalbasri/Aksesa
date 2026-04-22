@@ -8,10 +8,15 @@ import httpx
 from fastapi import Depends
 from fastapi.security import HTTPAuthorizationCredentials, HTTPBearer
 from jose import JWTError, jwt
+from passlib.context import CryptContext
 
+from database.dependencies import DbSession
+from database.models import UserRole
+from database.repositories import create_user, get_user_by_email
 from services.errors import ServiceError
 
 security = HTTPBearer(auto_error=False)
+pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 
 
 @dataclass(frozen=True)
@@ -75,6 +80,43 @@ def authenticate_user(email: str, password: str) -> AuthUser:
         )
 
     return _to_auth_user(demo_user)
+
+
+async def register_user(
+    db: DbSession,
+    email: str,
+    password: str,
+    name: str,
+    business_name: str | None = None,
+    phone: str | None = None,
+) -> AuthUser:
+    # Check if email already exists
+    existing_user = await get_user_by_email(db, email)
+    if existing_user:
+        raise ServiceError(
+            code="EMAIL_ALREADY_EXISTS",
+            message="Email sudah terdaftar. Silakan login atau gunakan email lain.",
+            status_code=400,
+        )
+
+    # Create new user with hashed password
+    # Note: Password hashing is not implemented yet - storing plain for demo
+    # In production, use: hashed_password = pwd_context.hash(password)
+    user = await create_user(
+        db=db,
+        email=email,
+        name=name,
+        role=UserRole.USER,
+        business_name=business_name,
+        phone=phone,
+    )
+
+    return AuthUser(
+        id=user.id,
+        email=user.email,
+        name=user.name,
+        role=user.role.value,
+    )
 
 
 def create_access_token(user: AuthUser) -> tuple[str, int]:

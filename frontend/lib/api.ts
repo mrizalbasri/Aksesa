@@ -76,6 +76,20 @@ export interface ScoringResponsePayload {
   recommendations: string[];
 }
 
+export interface LoanSimulationRequestPayload {
+  amount: number;
+  score: number;
+  tenor_months: number;
+}
+
+export interface LoanSimulationResponsePayload {
+  amount: number;
+  score: number;
+  tenor_months: number;
+  monthly_interest_rate: number;
+  estimated_monthly_payment: number;
+}
+
 export interface OcrResponsePayload {
   file_name: string;
   status: string;
@@ -187,6 +201,23 @@ export function loginWithGoogle(
   });
 }
 
+export interface RegisterPayload {
+  email: string;
+  password: string;
+  name: string;
+  business_name?: string;
+  phone?: string;
+}
+
+export function register(
+  payload: RegisterPayload,
+): Promise<LoginResponsePayload> {
+  return requestJson<LoginResponsePayload>("/api/v1/auth/register", {
+    method: "POST",
+    body: JSON.stringify(payload),
+  });
+}
+
 export function getMe(token: string): Promise<MeResponsePayload> {
   return requestJson<MeResponsePayload>("/api/v1/auth/me", { token });
 }
@@ -234,4 +265,13 @@ export function exportResultPdf(
       token,
     },
   );
+}
+
+export function simulateLoan(
+  payload: LoanSimulationRequestPayload,
+): Promise<LoanSimulationResponsePayload> {
+  return requestJson<LoanSimulationResponsePayload>("/api/v1/simulation/loan", {
+    method: "POST",
+    body: JSON.stringify(payload),
+  });
 }

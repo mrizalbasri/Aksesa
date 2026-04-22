@@ -4,21 +4,33 @@ import { Menu as MenuIcon } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Button } from "@/components/ui/button";
 import { LoginPanel } from "@/components/auth/LoginPanel";
+import { RegisterPanel } from "@/components/auth/RegisterPanel";
 import {
   AUTH_CHANGED_EVENT,
   SESSION_AUTH_TOKEN_KEY,
   getMe,
   login,
   loginWithGoogle,
+  register,
 } from "@/lib/api";
 
 const Navbar = () => {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [showLoginPrompt, setShowLoginPrompt] = useState(false);
+  const [showRegisterPrompt, setShowRegisterPrompt] = useState(false);
   const [loginEmail, setLoginEmail] = useState("");
   const [loginPassword, setLoginPassword] = useState("");
   const [loginError, setLoginError] = useState<string | null>(null);
   const [isLoggingIn, setIsLoggingIn] = useState(false);
+  // Register state
+  const [registerName, setRegisterName] = useState("");
+  const [registerEmail, setRegisterEmail] = useState("");
+  const [registerPassword, setRegisterPassword] = useState("");
+  const [registerConfirmPassword, setRegisterConfirmPassword] = useState("");
+  const [registerBusinessName, setRegisterBusinessName] = useState("");
+  const [registerPhone, setRegisterPhone] = useState("");
+  const [registerError, setRegisterError] = useState<string | null>(null);
+  const [isRegistering, setIsRegistering] = useState(false);
   const emailInputRef = useRef<HTMLInputElement | null>(null);
 
   useEffect(() => {
@@ -72,6 +84,19 @@ const Navbar = () => {
     }
     setShowLoginPrompt(false);
     setLoginError(null);
+  };
+
+  const openRegisterPrompt = () => {
+    setRegisterError(null);
+    setShowRegisterPrompt(true);
+  };
+
+  const closeRegisterPrompt = () => {
+    if (isRegistering) {
+      return;
+    }
+    setShowRegisterPrompt(false);
+    setRegisterError(null);
   };
 
   useEffect(() => {
@@ -173,6 +198,82 @@ const Navbar = () => {
     }
     setIsLoggedIn(false);
     setShowLoginPrompt(false);
+    setShowRegisterPrompt(false);
+    setLoginError(null);
+    setRegisterError(null);
+  };
+
+  const handleRegisterSubmit = async (event: FormEvent<HTMLFormElement>) => {
+    event.preventDefault();
+    setRegisterError(null);
+
+    // Validation
+    if (registerName.trim().length < 2) {
+      setRegisterError("Nama lengkap minimal 2 karakter.");
+      return;
+    }
+
+    const emailValid = /\S+@\S+\.\S+/.test(registerEmail);
+    if (!emailValid) {
+      setRegisterError("Masukkan email yang valid.");
+      return;
+    }
+
+    if (registerPassword.trim().length < 8) {
+      setRegisterError("Password minimal 8 karakter.");
+      return;
+    }
+
+    if (registerPassword !== registerConfirmPassword) {
+      setRegisterError("Password dan konfirmasi password tidak sama.");
+      return;
+    }
+
+    setIsRegistering(true);
+    try {
+      const response = await register({
+        email: registerEmail,
+        password: registerPassword,
+        name: registerName,
+        business_name: registerBusinessName.trim() || undefined,
+        phone: registerPhone.trim() || undefined,
+      });
+      if (typeof window !== "undefined") {
+        window.sessionStorage.setItem(
+          SESSION_AUTH_TOKEN_KEY,
+          response.access_token,
+        );
+        window.dispatchEvent(new Event(AUTH_CHANGED_EVENT));
+      }
+      setIsLoggedIn(true);
+      setShowRegisterPrompt(false);
+      // Reset form
+      setRegisterName("");
+      setRegisterEmail("");
+      setRegisterPassword("");
+      setRegisterConfirmPassword("");
+      setRegisterBusinessName("");
+      setRegisterPhone("");
+    } catch (error) {
+      const message =
+        error instanceof Error
+          ? error.message
+          : "Pendaftaran gagal. Silakan coba lagi.";
+      setRegisterError(message);
+    } finally {
+      setIsRegistering(false);
+    }
+  };
+
+  const switchToLogin = () => {
+    setShowRegisterPrompt(false);
+    setShowLoginPrompt(true);
+    setRegisterError(null);
+  };
+
+  const switchToRegister = () => {
+    setShowLoginPrompt(false);
+    setShowRegisterPrompt(true);
     setLoginError(null);
   };
 
@@ -218,14 +319,24 @@ const Navbar = () => {
                 Logout
               </Button>
             ) : (
-              <Button
-                type="button"
-                variant="outline"
-                className="h-10 border-[#111111] text-[#111111] hover:bg-[#111111] hover:text-white"
-                onClick={openLoginPrompt}
-              >
-                Login
-              </Button>
+              <div className="flex items-center gap-2">
+                <Button
+                  type="button"
+                  variant="ghost"
+                  className="h-10 text-[#626260] hover:bg-[#fcfaf7] hover:text-[#111111]"
+                  onClick={openLoginPrompt}
+                >
+                  Login
+                </Button>
+                <Button
+                  type="button"
+                  variant="outline"
+                  className="h-10 border-[#ff5600] bg-[#ff5600] text-white hover:bg-[#e64d00] hover:text-white"
+                  onClick={openRegisterPrompt}
+                >
+                  Daftar
+                </Button>
+              </div>
             )}
           </nav>
 
@@ -265,13 +376,22 @@ const Navbar = () => {
                     Logout
                   </button>
                 ) : (
-                  <button
-                    type="button"
-                    className="mt-1 block w-full rounded px-3 py-2 text-left text-sm text-[#111111] transition-colors hover:bg-[#f5f4f1]"
-                    onClick={openLoginPrompt}
-                  >
-                    Login
-                  </button>
+                  <>
+                    <button
+                      type="button"
+                      className="mt-1 block w-full rounded px-3 py-2 text-left text-sm text-[#111111] transition-colors hover:bg-[#f5f4f1]"
+                      onClick={openLoginPrompt}
+                    >
+                      Login
+                    </button>
+                    <button
+                      type="button"
+                      className="mt-1 block w-full rounded px-3 py-2 text-left text-sm font-medium text-[#ff5600] transition-colors hover:bg-[#fff4ee]"
+                      onClick={openRegisterPrompt}
+                    >
+                      Daftar
+                    </button>
+                  </>
                 )}
               </div>
             </details>
@@ -323,6 +443,63 @@ const Navbar = () => {
                 submitLabel="Masuk"
                 googleClientId={googleClientId}
                 onGoogleCredential={handleGoogleCredential}
+              />
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
+      <AnimatePresence>
+        {showRegisterPrompt && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 0.2 }}
+            className="fixed inset-0 z-[60] flex items-start justify-center bg-[#111111]/50 px-4 py-8 backdrop-blur-[3px] sm:items-center"
+            onClick={(event) => {
+              if (event.currentTarget === event.target && !isRegistering) {
+                closeRegisterPrompt();
+              }
+            }}
+            role="presentation"
+          >
+            <motion.div
+              initial={{ opacity: 0, y: 10, scale: 0.985 }}
+              animate={{ opacity: 1, y: 0, scale: 1 }}
+              exit={{ opacity: 0, y: 8, scale: 0.99 }}
+              transition={{ duration: 0.2, ease: "easeOut" }}
+              className="w-full max-w-md"
+              role="dialog"
+              aria-modal="true"
+              aria-labelledby="navbar-register-title"
+            >
+              <RegisterPanel
+                titleId="navbar-register-title"
+                nameId="header-register-name"
+                emailId="header-register-email"
+                passwordId="header-register-password"
+                businessNameId="header-register-business"
+                phoneId="header-register-phone"
+                emailRef={emailInputRef}
+                name={registerName}
+                email={registerEmail}
+                password={registerPassword}
+                confirmPassword={registerConfirmPassword}
+                businessName={registerBusinessName}
+                phone={registerPhone}
+                onNameChange={setRegisterName}
+                onEmailChange={setRegisterEmail}
+                onPasswordChange={setRegisterPassword}
+                onConfirmPasswordChange={setRegisterConfirmPassword}
+                onBusinessNameChange={setRegisterBusinessName}
+                onPhoneChange={setRegisterPhone}
+                error={registerError}
+                isSubmitting={isRegistering}
+                onSubmit={handleRegisterSubmit}
+                onClose={closeRegisterPrompt}
+                closeDisabled={isRegistering}
+                onSwitchToLogin={switchToLogin}
               />
             </motion.div>
           </motion.div>

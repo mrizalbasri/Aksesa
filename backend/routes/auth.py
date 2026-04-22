@@ -1,13 +1,15 @@
 from fastapi import APIRouter, Depends
 
+from database.dependencies import DbSession
 from routes.responses import service_error_response
-from schemas.auth import GoogleLoginRequest, LoginRequest, LoginResponse, UserResponse
+from schemas.auth import GoogleLoginRequest, LoginRequest, LoginResponse, RegisterRequest, UserResponse
 from services.auth_service import (
     AuthUser,
     authenticate_google_credential,
     authenticate_user,
     create_access_token,
     get_current_user,
+    register_user,
 )
 from services.errors import ServiceError
 
@@ -18,6 +20,28 @@ router = APIRouter(prefix="/api/v1/auth", tags=["Authentication"])
 async def login(payload: LoginRequest):
     try:
         user = authenticate_user(payload.email, payload.password)
+    except ServiceError as error:
+        return service_error_response(error)
+
+    token, expires_in = create_access_token(user)
+    return LoginResponse(
+        access_token=token,
+        expires_in=expires_in,
+        user=UserResponse(id=user.id, email=user.email, name=user.name, role=user.role),
+    )
+
+
+@router.post("/register", response_model=LoginResponse)
+async def register(payload: RegisterRequest, db: DbSession):
+    try:
+        user = await register_user(
+            db=db,
+            email=payload.email,
+            password=payload.password,
+            name=payload.name,
+            business_name=payload.business_name,
+            phone=payload.phone,
+        )
     except ServiceError as error:
         return service_error_response(error)
 

@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useRouter } from "next/router";
 import {
   useForm,
@@ -9,6 +9,7 @@ import {
 } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { scoringFormSchema, ScoringFormValues } from "@/lib/validators";
+import { getDemoData, getDemoModeFromURL, DEMO_PROFILES } from "@/lib/demoData";
 import {
   Card,
   CardContent,
@@ -95,21 +96,48 @@ const flattenErrors = (errors: FieldErrors<ScoringFormValues>): string[] => {
 const ScoringPageContent = () => {
   const [step, setStep] = useState(1);
   const [submitError, setSubmitError] = useState<string | null>(null);
+  const [demoMode, setDemoMode] = useState<keyof typeof DEMO_PROFILES | null>(null);
   const totalSteps = 4;
   const router = useRouter();
 
+  // Initialize form with optional demo data
+  const getDefaultValues = (): ScoringFormValues => {
+    const demoProfile = demoMode ? getDemoData(demoMode) : null;
+    
+    return {
+      file: undefined,
+      transactions: demoProfile?.transactions ?? [{ date: "", amount: 0 }],
+      tokopedia: demoProfile?.tokopedia ?? 0,
+      shopee: demoProfile?.shopee ?? 0,
+      businessAge: demoProfile?.businessAge ?? 0,
+      employees: demoProfile?.employees ?? 0,
+      location: demoProfile?.location ?? "",
+    };
+  };
+
   const methods = useForm<ScoringFormValues>({
     resolver: zodResolver(scoringFormSchema),
-    defaultValues: {
-      file: undefined,
-      transactions: [{ date: "", amount: 0 }],
-      tokopedia: 0,
-      shopee: 0,
-      businessAge: 0,
-      employees: 0,
-      location: "",
-    },
+    defaultValues: getDefaultValues(),
   });
+
+  // Load demo mode from URL on component mount
+  useEffect(() => {
+    const mode = getDemoModeFromURL();
+    if (mode) {
+      setDemoMode(mode);
+      // Update form with demo data
+      const demoData = getDemoData(mode);
+      methods.reset({
+        file: undefined,
+        transactions: demoData.transactions,
+        tokopedia: demoData.tokopedia,
+        shopee: demoData.shopee,
+        businessAge: demoData.businessAge,
+        employees: demoData.employees,
+        location: demoData.location,
+      });
+    }
+  }, [methods]);
 
   const {
     handleSubmit,
@@ -228,10 +256,17 @@ const ScoringPageContent = () => {
           {/* Main Form Content */}
           <div className="order-2 lg:order-1 flex flex-col gap-6">
             <Card className="rounded-xl border-[#dedbd6] bg-white shadow-sm">
-              <CardHeader className="space-y-6 border-b border-[#dedbd6] px-4 pb-7 pt-7 sm:px-7">
+               <CardHeader className="space-y-6 border-b border-[#dedbd6] px-4 pb-7 pt-7 sm:px-7">
                 <div className="space-y-2">
-                  <div className="inline-block text-[11px] font-semibold uppercase tracking-[0.08em] text-[#7b7b78]">
-                    Langkah {step} dari {totalSteps} — {stepLabels[step - 1]}
+                  <div className="flex items-center gap-2">
+                    <div className="inline-block text-[11px] font-semibold uppercase tracking-[0.08em] text-[#7b7b78]">
+                      Langkah {step} dari {totalSteps} — {stepLabels[step - 1]}
+                    </div>
+                    {demoMode && (
+                      <span className="inline-block rounded-full bg-[#e7f5e9] px-2.5 py-1 text-[10px] font-semibold uppercase tracking-[0.06em] text-[#2c6415]">
+                        Demo: {DEMO_PROFILES[demoMode].name}
+                      </span>
+                    )}
                   </div>
                   <CardTitle className="max-w-3xl text-[28px] font-medium leading-[1.08] tracking-[-0.8px] text-[#111111] sm:text-[38px] sm:tracking-[-1px] lg:text-[44px] lg:tracking-[-1.2px]">
                     {stepHeadings[step - 1]?.title ?? "Proses scoring"}

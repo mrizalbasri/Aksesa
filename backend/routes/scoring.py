@@ -22,6 +22,7 @@ from services.azure_blob import upload_document
 from services.azure_docintel import extract_text_only
 from services.ai_service import generate_recommendations
 from services.errors import ServiceError
+from services.ml_service import predict_credit_score
 
 router = APIRouter(prefix="/api/v1", tags=["Scoring"])
 
@@ -43,15 +44,25 @@ async def calculate_score(
     db: DbSession,
     user: AuthUser | None = Depends(get_current_user),
 ) -> ScoringResponse:
-    score = 35
+    # Use ML model to predict credit score
+    try:
+        score, features = predict_credit_score(payload)
+    except ServiceError:
+        raise
+    except Exception as exc:
+        raise ServiceError(
+            code="SCORING_FAILED",
+            message="Gagal menghitung skor kredit.",
+            status_code=500,
+        ) from exc
+
+    # Generate explanatory factors based on features
     factors: list[str] = []
 
     transaction_count = len(payload.transactions)
     if transaction_count > 0:
         avg_amount = sum(item.amount for item in payload.transactions) / transaction_count
-        score += min(transaction_count * 2, 20)
         if avg_amount >= 1_000_000:
-            score += 8
             factors.append("Rata-rata transaksi stabil di nominal menengah ke atas.")
         else:
             factors.append("Frekuensi transaksi aktif perlu diimbangi peningkatan nominal.")
@@ -60,21 +71,17 @@ async def calculate_score(
 
     marketplace_total = payload.tokopedia + payload.shopee
     if marketplace_total > 0:
-        score += min(int(marketplace_total // 1_000_000), 10)
         factors.append("Terdapat penjualan marketplace yang mendukung profil pendapatan.")
 
     if payload.businessAge > 0:
-        score += min(payload.businessAge * 2, 15)
         factors.append("Usia bisnis menunjukkan konsistensi operasional.")
 
     if payload.employees >= 3:
-        score += 5
         factors.append("Jumlah karyawan menunjukkan kapasitas operasional yang memadai.")
 
     if payload.location.strip():
-        score += 3
+        factors.append("Lokasi bisnis teridentifikasi.")
 
-    score = max(0, min(score, 100))
     category = _risk_category(score)
 
     recommendations = generate_recommendations(payload, score, category, factors)

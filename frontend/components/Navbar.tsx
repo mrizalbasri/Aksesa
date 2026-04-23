@@ -271,12 +271,6 @@ const Navbar = () => {
     setRegisterError(null);
   };
 
-  const switchToRegister = () => {
-    setShowLoginPrompt(false);
-    setShowRegisterPrompt(true);
-    setLoginError(null);
-  };
-
   return (
     <>
       <header className="sticky top-0 z-50 w-full border-b border-[#dedbd6] bg-[#faf9f6]/95 backdrop-blur-sm">

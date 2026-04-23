@@ -14,16 +14,6 @@ const LandingHero = () => {
       <div className="relative z-10 mx-auto max-w-6xl px-4 sm:px-6 lg:px-8">
         <div className="grid grid-cols-1 items-start gap-8 md:grid-cols-12 md:gap-12">
           <div className="flex flex-col items-start md:col-span-8">
-            <motion.div
-              initial={{ opacity: 0, y: -10 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.4, delay: 0.05 }}
-              className="mb-5 inline-flex items-center gap-2 rounded border border-[#dedbd6] bg-white px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.1em] text-[#626260]"
-            >
-              <span className="h-2 w-2 rounded-full bg-[#ff5600]" />
-              Credit Scoring Engine 1.0
-            </motion.div>
-
             <motion.h1
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
@@ -50,12 +40,11 @@ const LandingHero = () => {
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.5, delay: 0.3 }}
-              className="mt-7 flex w-full flex-col gap-3 sm:w-auto sm:flex-row sm:gap-4"
+              className="mt-8 w-full sm:w-auto"
             >
               <motion.div
                 whileHover={{ scale: 1.02 }}
                 whileTap={{ scale: 0.98 }}
-                className="w-full sm:w-auto"
               >
                 <Link
                   href="/scoring"
@@ -65,15 +54,6 @@ const LandingHero = () => {
                   <ArrowUpRight className="ml-2 size-5 transition-transform group-hover:-translate-y-0.5 group-hover:translate-x-0.5" />
                 </Link>
               </motion.div>
-
-              <motion.a
-                whileHover={{ scale: 1.02 }}
-                whileTap={{ scale: 0.98 }}
-                href="#fitur"
-                className="group inline-flex h-12 w-full items-center justify-center rounded border border-[#111111] bg-white px-6 text-sm font-medium text-[#111111] transition-colors hover:bg-[#111111] hover:text-white sm:h-14 sm:w-auto sm:px-8 sm:text-base"
-              >
-                Penjelasan Metode
-              </motion.a>
             </motion.div>
 
             <motion.p

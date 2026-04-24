@@ -22,3 +22,5 @@ venv/
 env/
 *.pkl
 *.joblib
+demo.md
+aksesa.db

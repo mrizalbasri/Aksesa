@@ -24,3 +24,19 @@ env/
 *.joblib
 demo.md
 aksesa.db
+
+# 🚫 Internal working files - DO NOT PUSH
+# Agent configuration & skills (internal development infrastructure)
+.agents/
+
+# Planning & phase files (internal project management)
+PHASE_*_PLAN.md
+DEVELOPMENT_PLAN.md
+DEMO_*.md
+**/PHASE_*_PLAN.md
+**/DEVELOPMENT_PLAN.md
+**/BACKEND_TRUST_FIRST_API_PLAN.md
+**/PHASE_PLAN_FORMAT.md
+
+# Design system temp files
+docs/superpowers/

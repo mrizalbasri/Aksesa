@@ -37,6 +37,11 @@ DEMO_*.md
 **/DEVELOPMENT_PLAN.md
 **/BACKEND_TRUST_FIRST_API_PLAN.md
 **/PHASE_PLAN_FORMAT.md
+.DEMO_DEPLOYMENT_CHECKLIST.md
+DEMO_QUICK_START.md
+.azure/deployment-plan.md
+DESIGN.md
+frontend/SETUP.md
 
 # Design system temp files
 docs/superpowers/

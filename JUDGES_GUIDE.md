@@ -4,27 +4,9 @@
 
 ---
 
-## ⚡ Fastest Path: 5-Minute Demo
+## 🚀 Complete Local Setup: 10 Minutes
 
-### Demo Account (No Installation Needed!)
-
-Jika aplikasi sudah ter-deploy di Azure:
-
-1. **Open Website**: https://[your-deployed-app].azurewebsites.net/
-2. **Click "Demo Mode"** atau gunakan akun demo:
-   - Email: `demo@aksesa.id`
-   - Password: `Aksesa123!`
-3. **Test scoring flow**: Upload invoice → See results in 2 seconds
-4. **View recommendations**: AI-generated suggestions appear instantly
-5. **Try simulation**: Input pinjaman amount → lihat estimasi cicilan
-
-✅ **Done! Total time: ~2 minutes**
-
----
-
-## 🚀 Full Local Setup: 10 Minutes
-
-Jika ingin test secara local:
+**This is the primary testing path** (No Azure deployment needed)
 
 ### Requirements
 
@@ -32,7 +14,6 @@ Jika ingin test secara local:
 ✓ Git
 ✓ Node.js 18+
 ✓ Python 3.10+
-✓ (Optional) Docker
 ```
 
 ### Step 1: Clone & Install (3 minutes)
@@ -55,31 +36,34 @@ cd ../ml
 # Models exist at ml/models/credit_model.pkl ✅
 ```
 
-### Step 2: Setup Environment (2 minutes)
+### Step 2: Setup Environment (1 minute)
 
 ```bash
 cd backend
 cp .env.example .env
 ```
 
-**Edit `.env`** (minimal setup):
+**✅ Done!** Default `.env` is already configured for local testing:
+- ✓ SQLite database (no setup needed)
+- ✓ Demo credentials pre-configured
+- ✓ Fallback LLM enabled (Groq)
+- ✓ CORS already set for localhost
 
-```env
-# Database (use SQLite - no Azure needed!)
-DB_SQLITE_PATH=./aksesa.db
+**Optional**: If you want to use Azure services, add your keys to `.env`
 
-# JWT Secret (any random string for local testing)
-SECRET_KEY=test-secret-key-123
+### Step 3: Train ML Model (1 minute - SKIP if models exist)
 
-# API Allowlist
-ALLOWED_ORIGINS=http://localhost:3000,http://localhost:8000
+```bash
+# Check if models exist (they should)
+ls ml/models/
+# Output: credit_model.pkl  scaler.pkl
 
-# Leave Azure keys empty - app will use fallback (Groq LLM)
-AZURE_OPENAI_API_KEY=
-AZURE_DOC_INTEL_KEY=
+# If missing, train:
+cd ml
+python train_model.py
 ```
 
-### Step 3: Start Servers (2 minutes)
+### Step 4: Start Servers (2 minutes)
 
 **Terminal 1 - Frontend:**
 ```bash
@@ -95,7 +79,7 @@ python -m uvicorn main:app --reload
 # API available at http://localhost:8000
 ```
 
-### Step 4: Test App (3 minutes)
+### Step 5: Test App (3 minutes)
 
 #### 🎯 Flow 1: Quick Demo (No Login)
 
@@ -190,47 +174,52 @@ Loan Simulation (Input: 10 juta IDR):
 
 ---
 
-## 🔗 Important URLs
+## 🔗 Important URLs (All Local)
 
-| What | URL |
-|------|-----|
-| Landing page | http://localhost:3000 |
-| Scoring form | http://localhost:3000/scoring |
-| Demo page | http://localhost:3000/demo |
-| Results example | http://localhost:3000/result |
-| Login | http://localhost:3000/login |
-| Backend health | http://localhost:8000/health |
-| API Swagger docs | http://localhost:8000/docs |
-| API ReDoc docs | http://localhost:8000/redoc |
+| What | URL | Purpose |
+|------|-----|---------|
+| **Landing page** | http://localhost:3000 | Homepage |
+| **Scoring form** | http://localhost:3000/scoring | Main feature - fill form & get score |
+| **Demo mode** | http://localhost:3000/demo | Pre-filled example |
+| **Results page** | http://localhost:3000/result | See scoring results |
+| **Login** | http://localhost:3000/login | User authentication |
+| **Backend health** | http://localhost:8000/health | API status check |
+| **API Swagger** | http://localhost:8000/docs | Full API documentation |
 
 ---
 
-## 🎯 Evaluation Checklist
+## 🎯 Evaluation Checklist (Per Judging Criteria)
 
-### **Innovation & Novelty** (25%)
+### **1. Innovation & Novelty** (25%)
+While testing, look for:
 - ✅ Alternative data for credit scoring (not traditional financial statements)
-- ✅ Explainable AI (why score is X)
+- ✅ Explainable AI (shows why score is X, not just a number)
 - ✅ Realistic for Indonesian UMKM use case
+- ✅ Unique approach compared to traditional bank systems
 
-### **Design & UX** (25%)
-- ✅ Clean, minimalist interface
-- ✅ Easy form to fill (even non-technical users)
-- ✅ Gauge chart visualization
-- ✅ Clear categorization (Layak Kredit / Risiko Sedang / Risiko Tinggi)
-- ✅ Mobile responsive (if checked on phone)
+### **2. Design & UX** (25%)
+While testing, look for:
+- ✅ Clean, minimalist interface (no clutter)
+- ✅ Simple form (UMKM non-technical users can fill it)
+- ✅ Visual scoring display (gauge chart)
+- ✅ Clear risk categories (Layak Kredit / Risiko Sedang / Risiko Tinggi)
+- ✅ Responsive design (works on desktop & mobile)
 
-### **AI & Azure Integration** (30%)
-- ✅ ML model predicts scores
-- ✅ Azure OpenAI generates recommendations (or fallback Groq)
-- ✅ Document Intelligence for OCR (if Azure keys provided)
-- ✅ SQL database saves results
-- ✅ API structure clean & well-documented
+### **3. AI & Azure Integration** (30%)
+Technical implementation:
+- ✅ ML model predicts scores (scikit-learn Random Forest)
+- ✅ LLM generates recommendations (Azure OpenAI or fallback Groq)
+- ✅ Document OCR ready (uses Document Intelligence when available)
+- ✅ Database stores results (SQLAlchemy ORM, SQLite local / Azure SQL prod)
+- ✅ API well-structured (FastAPI with Swagger docs)
 
-### **Social Impact** (20%)
+### **4. Social Impact** (20%)
+Business value:
 - ✅ Targets unbanked UMKM (64+ million in Indonesia)
-- ✅ Solves real problem: UMKM difficulty accessing formal credit
-- ✅ Transparent scoring → builds trust
-- ✅ Portable report (can take to bank/koperasi)
+- ✅ Solves real problem (UMKM can't access formal credit)
+- ✅ Transparent scoring (users understand why approved/rejected)
+- ✅ Actionable recommendations (how to improve score)
+- ✅ Portable results (PDF export for bank/koperasi)
 
 ---
 
@@ -284,140 +273,181 @@ ALLOWED_ORIGINS=http://localhost:3000,http://localhost:8000
 
 ---
 
-## 📱 Screenshots Walkthrough
+## 🎨 What You'll See
 
-### 1. Landing Page
-```
-[Hero Section]
-Aksesa - AI-Powered Credit Scoring
-"Setiap UMKM berhak mendapat akses modal yang adil"
+### Flow: Landing → Scoring → Results
 
-[CTA Button]
-"Mulai Scoring"
+**Landing Page**
+```
+Hero: "Aksesa - AI-Powered Credit Scoring"
+Tagline: "Akses modal untuk semua UMKM"
+CTA Button: "Mulai Scoring"
 ```
 
-### 2. Scoring Form
+**Scoring Form** (http://localhost:3000/scoring)
 ```
-Input Transaction Data:
-  □ Transaction 1: [100000] IDR
-  □ Transaction 2: [150000] IDR
-  □ Transaction 3: [120000] IDR
+Step 1: Enter Transaction Data
+  □ Daily sales (3+ entries): [100000] [150000] [120000] IDR
   
-Business Profile:
-  □ Name: [Toko Kami]
+Step 2: Business Profile
+  □ Business name: [Toko Kami]
   □ Years in business: [3]
-  □ Employees: [2]
+  □ Number of employees: [2]
   
-[Upload Invoice Image] (optional)
+Step 3: Optional
+  □ Upload invoice image (JPG/PNG)
   
-[Submit]
+[Calculate Score Button]
 ```
 
-### 3. Results Dashboard
+**Results Dashboard** (http://localhost:3000/result)
 ```
-┌─────────────────────────────────┐
-│    CREDIT SCORE: 72/100         │
-│         LAYAK KREDIT            │
-│     (Medium-High Approval)      │
-└─────────────────────────────────┘
+┌──────────────────────────────────────┐
+│   AKSESA CREDIT SCORE: 72 / 100      │
+│           LAYAK KREDIT               │
+│   (Approved for Financing)           │
+└──────────────────────────────────────┘
 
-Factors Breakdown:
-  ✓ Daily sales avg: 123K (Good)
-  ✓ Business stability: 3y (Good)
-  ◐ Employee count: 2 (Neutral)
-  ✗ Missing invoice data (Risk)
+📊 Score Breakdown:
+  • Average daily sales: 123,333 IDR → +15 points ✅
+  • Business stability: 3 years → +12 points ✅
+  • Employee count: 2 → +5 points ⚠️
+  • Transaction consistency: Good → +10 points ✅
+  • Missing invoice data → -5 points ❌
 
-AI Recommendations:
-  "Untuk meningkatkan skor Anda..."
-  
-Loan Simulation:
-  Amount: 10,000,000 IDR
-  Tenor: 24 months
-  Payment/month: 450,000 IDR
-  
-[Export PDF]
+💡 AI Recommendations:
+  "Untuk meningkatkan skor Anda ke kategori lebih baik:
+   1. Tambahkan data penjualan minimal 6 bulan terakhir
+   2. Upload invoice terbaru untuk validasi
+   3. Tingkatkan jumlah karyawan atau omzet"
+
+💰 Loan Simulation:
+  Requested: 10,000,000 IDR
+  Recommended Tenor: 24 months
+  Monthly Payment: ~450,000 IDR
+  Annual Interest: ~8.5%
+
+[📥 Export as PDF] [↩️ New Scoring]
 ```
 
 ---
 
 ## 🤔 FAQ for Judges
 
-**Q: Do I need Azure account?**  
-A: No! Local setup uses SQLite + fallback LLM. Azure keys are optional.
+**Q: Do I need to install anything?**  
+A: Yes, just Git + Node.js + Python (instructions above). No Azure account needed!
 
-**Q: Can I test with real invoice?**  
-A: Yes! Upload JPG/PNG invoice image. OCR will extract data (if Azure keys provided).
+**Q: Can I test without entering real data?**  
+A: Yes! Click "Demo Mode" at `/demo` for pre-filled example. Or use random test numbers.
 
-**Q: Is the ML model trained?**  
-A: Yes! Models are committed to repo at `ml/models/`. Ready to use.
+**Q: What if the ML model isn't loaded?**  
+A: Check `ml/models/` folder. If empty, run `cd ml && python train_model.py` (takes 1 min).
 
-**Q: How accurate is the score?**  
-A: Score reflects simplified Random Forest model trained on demo data. Production would use more comprehensive training.
+**Q: Can I test document OCR?**  
+A: Yes! Upload JPG/PNG invoice. Without Azure keys, it shows placeholder. With keys, actual OCR works.
 
-**Q: Can I export results as PDF?**  
-A: Yes! Click "Export as PDF" on results page. (If feature implemented)
+**Q: How accurate is the credit score?**  
+A: For demo purposes, this is a simplified Random Forest model. Production uses larger dataset & more features.
 
-**Q: What if I get 0 score?**  
-A: This might mean missing required data. Check form inputs. Retry with valid numbers.
+**Q: Can I see the API documentation?**  
+A: Yes! Go to http://localhost:8000/docs (Swagger) or http://localhost:8000/redoc (ReDoc).
 
-**Q: Can multiple users test simultaneously?**  
-A: Yes! Each gets separate session/token. Database supports concurrent requests.
+**Q: Is the database saved?**  
+A: Yes! SQLite database at `backend/aksesa.db`. Survives restarts. Delete to reset.
 
-**Q: Is the data secure?**  
-A: Yes! JWT auth, HTTPS, encrypted passwords. Local setup uses in-memory auth.
+**Q: Can multiple people test at same time?**  
+A: Yes! Each gets separate session. Recommended: each person opens in different browser/incognito window.
 
 ---
 
 ## 📞 Quick Help
 
-**Something broken?**
+**Backend won't start (Python error)?**
+```bash
+# Reinstall Python dependencies
+cd backend
+pip install -r requirements.txt
 
-1. Check **Terminal 2 (Backend logs)** for Python errors
-2. Check **Browser DevTools → Console** for frontend errors
-3. Restart both servers (Ctrl+C, then run again)
-4. Clear browser cache (Ctrl+Shift+Delete)
-5. Reinstall dependencies:
-   ```bash
-   cd frontend && npm install
-   cd backend && pip install -r requirements.txt
-   ```
+# Then restart backend
+python -m uvicorn main:app --reload
+```
+
+**Frontend won't load?**
+```bash
+# Reinstall Node dependencies
+cd frontend
+npm install
+
+# Then restart frontend
+npm run dev
+```
+
+**Database errors?**
+```bash
+# Fresh database
+cd backend
+rm aksesa.db
+# Restart backend → creates new DB
+```
+
+**CORS error in browser?**
+```bash
+# Just means API URL is wrong. Check that backend is running at:
+http://localhost:8000
+```
 
 **Need more details?**
-- See [README.md](./README.md) for full architecture
-- See [DEPLOYMENT.md](./DEPLOYMENT.md) for Azure deployment
-- See [AGENTS.md](./AGENTS.md) for developer guide
+- Architecture → [README.md](./README.md)
+- Deployment (optional) → [DEPLOYMENT.md](./DEPLOYMENT.md)
+- Developer docs → [AGENTS.md](./AGENTS.md)
 
 ---
 
-## ✅ Sign-Off
+## ✅ Quick Evaluation Checklist
 
-After testing, please verify:
+After testing locally, verify:
 
-- [ ] **Scoring works** - Form → Results (5-10 seconds)
-- [ ] **Score displays** - 0-100 range with category
-- [ ] **Recommendations show** - AI text visible
-- [ ] **UI is clean** - Professional, minimal design
-- [ ] **No errors** - No red errors in console or backend logs
+- [ ] **Scoring works** - Form → Results (appears in 2-3 seconds)
+- [ ] **Score range** - Shows 0-100 with category badge
+- [ ] **AI recommendations** - Text appears (or fallback message)
+- [ ] **UI clean** - Professional look, no errors visible
+- [ ] **No console errors** - Check browser DevTools → Console
+- [ ] **Backend logs clean** - No red errors in terminal
 
-### Submit Feedback
-- 🐛 Bug report: Open GitHub issue
-- 💡 Suggestion: Comment on GitHub discussion
-- ⭐ Liked it? Star the repo!
+## 📊 Evaluation Score Card
+
+After testing, rate on these criteria:
+
+| Criterion | Rating | Notes |
+|-----------|--------|-------|
+| **Innovation** (25%) | 🟢🟡🔴 | Alternative data + Explainable AI? |
+| **Design & UX** (25%) | 🟢🟡🔴 | Clean interface, easy to use? |
+| **AI & Azure** (30%) | 🟢🟡🔴 | ML + LLM working? API clean? |
+| **Social Impact** (20%) | 🟢🟡🔴 | Solves real UMKM problem? |
 
 ---
 
 <div align="center">
 
-**Thank you for evaluating Aksesa! 🙏**
+### 🙏 Thank you for evaluating Aksesa!
 
-Questions? Check [README.md](./README.md) or [DEPLOYMENT.md](./DEPLOYMENT.md)
+**Questions?** Check:
+- [README.md](./README.md) — Full overview
+- [AGENTS.md](./AGENTS.md) — Technical details
+- [SUBMISSION_CHECKLIST.md](./SUBMISSION_CHECKLIST.md) — Scoring criteria
+
+**Issues?** Open GitHub issue → we'll help
+
+---
 
 **Made with ❤️ for Indonesian UMKM**
+
+*"Setiap UMKM berhak mendapat akses modal yang adil"*
 
 </div>
 
 ---
 
-**Version**: 1.0  
+**Version**: 1.1 (Local Testing Optimized)  
 **Last Updated**: 2026-04-27  
-**Status**: Judge-Ready ✅
+**Status**: Ready for Evaluation ✅

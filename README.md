@@ -6,7 +6,7 @@
 **Submission for AI Impact Challenge** — Microsoft Elevate Training Center × Dicoding × Komdigi  
 Category: **Real Sector Economy — Akses Pembiayaan & Credit Scoring UMKM (No. 19)**
 
-[🚀 Quick Start](#-quick-start) • [📋 Fitur](#-fitur-utama) • [🏗️ Arsitektur](#-arsitektur) • [📦 Deploy](#-deployment) • [👥 Tim](#-tim)
+[🚀 Quick Start](#-quick-start) • [📋 Fitur](#-fitur-utama) • [🏗️ Arsitektur](#-arsitektur) • [👥 Tim](#-tim)
 
 </div>
 
@@ -259,35 +259,6 @@ curl http://localhost:8000/health
 
 ---
 
-## 📦 Deployment to Azure
-
-### Option A: Azure Developer CLI (Recommended)
-
-```bash
-# 1. Install Azure Developer CLI
-# https://learn.microsoft.com/en-us/azure/developer/azure-developer-cli/install-azd
-
-# 2. Login to Azure
-azd auth login
-
-# 3. Deploy
-azd up
-
-# This will:
-# - Create resource group
-# - Deploy infrastructure (Bicep)
-# - Build & push Docker images
-# - Deploy to App Service
-# - Configure Azure services
-# - Grant SQL permissions
-```
-
-### Option B: Manual Azure Portal (if needed)
-
-See **[DEPLOYMENT.md](./DEPLOYMENT.md)** for step-by-step guide.
-
----
-
 ## 📁 Project Structure
 
 ```
@@ -350,8 +321,8 @@ aksesa/
 ├── azure.yaml                     # Azure Developer CLI config
 ├── docker-compose.yml             # Local docker-compose (if needed)
 ├── README.md                       # This file
-├── DEPLOYMENT.md                  # Detailed deployment guide
 ├── JUDGES_GUIDE.md                # Quick start for judges
+├── SUBMISSION.md                  # Submission guidelines
 └── .env.example                   # Root env template
 ```
 
@@ -442,9 +413,8 @@ Swagger API docs tersedia di: `http://localhost:8000/docs`
 ## 📞 Support & Documentation
 
 - **Quick Start**: See [Quick Start](#-quick-start) above
-- **Deployment**: See [DEPLOYMENT.md](./DEPLOYMENT.md)
 - **For Judges**: See [JUDGES_GUIDE.md](./JUDGES_GUIDE.md)
-- **Developer Guide**: See [AGENTS.md](./AGENTS.md)
+- **Submission Info**: See [SUBMISSION.md](./SUBMISSION.md)
 - **API Docs**: Run backend, go to `http://localhost:8000/docs`
 
 ---

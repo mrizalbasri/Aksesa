@@ -187,8 +187,8 @@ Aksesa adalah platform credit scoring berbasis AI yang mengevaluasi kelayakan kr
 
 ```bash
 # Clone repo
-git clone https://github.com/username/aksesa.git
-cd aksesa
+git clone https://github.com/mrizalbasri/Aksesa.git
+cd Aksesa
 
 # Frontend
 cd frontend
@@ -453,7 +453,7 @@ Swagger API docs tersedia di: `http://localhost:8000/docs`
 
 | Nama | Role |
 |------|------|
-| [Nama Anda] | Full-Stack Developer & AI Engineer |
+| M. Rizal Basri | Full-Stack Developer & AI Engineer |
 
 ---
 
@@ -480,6 +480,6 @@ MIT License — Bebas digunakan untuk keperluan edukasi dan pengembangan lebih l
 
 **Made with ❤️ for Indonesian SMEs**
 
-[Report Issue](https://github.com/username/aksesa/issues) • [Request Feature](https://github.com/username/aksesa/discussions)
+[Report Issue](https://github.com/mrizalbasri/Aksesa/issues) • [Request Feature](https://github.com/mrizalbasri/Aksesa/discussions)
 
 </div>

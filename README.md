@@ -12,6 +12,21 @@ Category: **Real Sector Economy — Akses Pembiayaan & Credit Scoring UMKM (No. 
 
 ---
 
+## ⚠️ IMPORTANT: Demo/Prototype Notice
+
+**This is a prototype/demo version for hackathon submission. For production use, the following must be implemented:**
+
+- ✅ Password hashing (currently stored in plain text for demo)
+- ✅ Strong JWT secret key configuration
+- ✅ Rate limiting for API endpoints
+- ✅ Real UMKM training data for ML model (currently using synthetic data)
+- ✅ Comprehensive input validation
+- ✅ Production-grade error handling and logging
+
+See the [Known Limitations](#-known-limitations) section for details.
+
+---
+
 ## 📌 Latar Belakang
 
 **Masalah:**
@@ -121,12 +136,12 @@ Aksesa adalah platform credit scoring berbasis AI yang mengevaluasi kelayakan kr
 
 | Service | Fungsi | Status |
 |---------|--------|--------|
-| **Azure OpenAI (GPT-4o)** | Generate rekomendasi personal & analisis narasi | ✅ Integrated |
-| **Document Intelligence** | OCR untuk membaca nota dan invoice otomatis | ✅ Integrated |
-| **App Service** | Hosting frontend (Next.js) & backend (FastAPI) | ✅ Integrated |
-| **Blob Storage** | Penyimpanan dokumen yang diupload user | ✅ Integrated |
-| **SQL Database** | Penyimpanan user data & scoring results | ✅ Integrated |
-| **Application Insights** | Monitoring, logging, dan analytics | ✅ Integrated |
+| **Azure OpenAI (GPT-4o)** | Generate rekomendasi personal & analisis narasi | ⚠️ Integrated (with Groq fallback) |
+| **Document Intelligence** | OCR untuk membaca nota dan invoice otomatis | ⚠️ Integrated (with fallback mode) |
+| **App Service** | Hosting frontend (Next.js) & backend (FastAPI) | 📋 Planned |
+| **Blob Storage** | Penyimpanan dokumen yang diupload user | 📋 Planned |
+| **SQL Database** | Penyimpanan user data & scoring results | ⚠️ SQLite (dev) / Azure SQL (prod) |
+| **Application Insights** | Monitoring, logging, dan analytics | 📋 Planned |
 
 ---
 
@@ -194,8 +209,12 @@ cd Aksesa
 cd frontend
 npm install
 
-# Backend
+# Backend (with virtual environment)
 cd ../backend
+python -m venv .venv
+# Activate virtual environment:
+# Windows: .venv\Scripts\activate
+# Linux/Mac: source .venv/bin/activate
 pip install -r requirements.txt
 
 # ML
@@ -433,14 +452,53 @@ MIT License — Bebas digunakan untuk keperluan edukasi dan pengembangan lebih l
 
 ---
 
-## 🎯 Roadmap (Future)
+## ⚠️ Known Limitations
 
-- [ ] Integration dengan API marketplace (Tokopedia, Shopee, Bukalapak)
-- [ ] Blockchain-based certificate untuk scoring results
-- [ ] Mobile app (React Native)
-- [ ] Kerjasama dengan fintech partners untuk real loan disbursement
-- [ ] Advanced analytics dashboard untuk lenders
-- [ ] Multi-language support
+**Security & Authentication:**
+- Password storage uses plain text (demo only - requires bcrypt hashing for production)
+- JWT secret key uses default value (must be changed to strong random key)
+- No rate limiting implemented (vulnerable to brute force attacks)
+- Database authentication skipped for demo users
+
+**ML Model:**
+- Trained on synthetic/random data (not real UMKM data)
+- Hardcoded mock values for payment history and revenue stability
+- No model validation or monitoring in production
+- Feature calculations use assumptions rather than real data
+
+**Data & Validation:**
+- Limited input validation on business metrics
+- No comprehensive error handling
+- Missing structured logging for debugging
+
+**Infrastructure:**
+- SQLite database for development (not production-ready)
+- No automated testing (zero test coverage)
+- Missing database migrations management
+
+---
+
+## 🎯 Next Steps
+
+**Phase 1: Security & Stability (Critical)**
+- [ ] Implement password hashing with bcrypt
+- [ ] Configure strong JWT secret keys
+- [ ] Add rate limiting middleware
+- [ ] Implement proper database authentication
+- [ ] Add structured logging
+
+**Phase 2: ML Model Improvement**
+- [ ] Collect real UMKM transaction data
+- [ ] Retrain model with actual data
+- [ ] Implement model validation and monitoring
+- [ ] Replace mock values with real calculations
+
+**Phase 3: Production Readiness**
+- [ ] Add comprehensive testing (unit + integration)
+- [ ] Implement database migrations with Alembic
+- [ ] Add monitoring and alerting
+- [ ] Deploy to Azure with proper configuration
+- [ ] Integration dengan API marketplace (Tokopedia, Shopee)
 
 ---
 
@@ -450,6 +508,6 @@ MIT License — Bebas digunakan untuk keperluan edukasi dan pengembangan lebih l
 
 **Made with ❤️ for Indonesian SMEs**
 
-[Report Issue](https://github.com/mrizalbasri/Aksesa/issues) • [Request Feature](https://github.com/mrizalbasri/Aksesa/discussions)
+**GitHub Repository:** [github.com/mrizalbasri/Aksesa](https://github.com/mrizalbasri/Aksesa)
 
 </div>

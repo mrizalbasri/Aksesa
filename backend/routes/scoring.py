@@ -21,6 +21,7 @@ from services.auth_service import AuthUser, get_current_user
 from services.azure_blob import upload_document
 from services.azure_docintel import extract_text_only
 from services.ai_service import generate_recommendations
+from services.credit_service import check_and_deduct_credits
 from services.errors import ServiceError
 from services.ml_service import predict_credit_score
 
@@ -44,6 +45,19 @@ async def calculate_score(
     db: DbSession,
     user: AuthUser | None = Depends(get_current_user),
 ) -> ScoringResponse:
+    # Check and deduct credits if user is authenticated
+    if user:
+        try:
+            await check_and_deduct_credits(db, user.id, "scoring")
+        except ServiceError as e:
+            if e.code == "INSUFFICIENT_CREDITS":
+                raise ServiceError(
+                    code="INSUFFICIENT_CREDITS",
+                    message="Kredit Anda habis. Upgrade ke Premium untuk unlimited scoring!",
+                    status_code=402
+                )
+            raise
+    
     # Use ML model to predict credit score
     try:
         score, features = predict_credit_score(payload)

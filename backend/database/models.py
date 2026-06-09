@@ -13,6 +13,12 @@ class UserRole(str, Enum):
     DEMO = "demo"
 
 
+class SubscriptionTier(str, Enum):
+    FREE = "free"
+    BASIC = "basic"
+    PREMIUM = "premium"
+
+
 class User(Base):
     __tablename__ = "users"
 
@@ -25,6 +31,17 @@ class User(Base):
     business_name: Mapped[str | None] = mapped_column(String(255), default=None)
     business_address: Mapped[str | None] = mapped_column(Text, default=None)
     phone: Mapped[str | None] = mapped_column(String(20), default=None)
+    
+    # Credits system
+    free_credits: Mapped[int] = mapped_column(Integer, default=5, nullable=False)
+    premium_credits: Mapped[int] = mapped_column(Integer, default=0, nullable=False)
+    subscription_tier: Mapped[SubscriptionTier] = mapped_column(
+        SQLEnum(SubscriptionTier), default=SubscriptionTier.FREE, nullable=False
+    )
+    last_credit_reset: Mapped[datetime | None] = mapped_column(
+        DateTime(timezone=True), default=None
+    )
+    
     created_at: Mapped[datetime] = mapped_column(
         DateTime(timezone=True), server_default=func.now(), nullable=False
     )
@@ -37,6 +54,9 @@ class User(Base):
     )
     documents: Mapped[list["Document"]] = relationship(
         "Document", back_populates="user", cascade="all, delete-orphan"
+    )
+    credit_transactions: Mapped[list["CreditTransaction"]] = relationship(
+        "CreditTransaction", back_populates="user", cascade="all, delete-orphan"
     )
 
 
@@ -119,3 +139,29 @@ class Document(Base):
     )
 
     user: Mapped["User"] = relationship("User", back_populates="documents")
+
+
+class CreditAction(str, Enum):
+    SCORING = "scoring"
+    OCR = "ocr"
+    SIMULATION = "simulation"
+    BONUS = "bonus"
+    PURCHASE = "purchase"
+
+
+class CreditTransaction(Base):
+    __tablename__ = "credit_transactions"
+
+    id: Mapped[str] = mapped_column(String(80), primary_key=True)
+    user_id: Mapped[str] = mapped_column(
+        String(80), ForeignKey("users.id", ondelete="CASCADE"), nullable=False, index=True
+    )
+    action: Mapped[CreditAction] = mapped_column(SQLEnum(CreditAction), nullable=False)
+    credits_used: Mapped[int] = mapped_column(Integer, nullable=False)
+    credits_remaining: Mapped[int] = mapped_column(Integer, nullable=False)
+    description: Mapped[str | None] = mapped_column(String(500), default=None)
+    created_at: Mapped[datetime] = mapped_column(
+        DateTime(timezone=True), server_default=func.now(), nullable=False
+    )
+
+    user: Mapped["User"] = relationship("User", back_populates="credit_transactions")

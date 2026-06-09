@@ -115,6 +115,10 @@ async def register_user(
         phone=phone,
     )
 
+    # Grant welcome bonus credits to new user
+    from services.credit_service import grant_welcome_bonus
+    await grant_welcome_bonus(db, user.id)
+
     return AuthUser(
         id=user.id,
         email=user.email,

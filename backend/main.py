@@ -13,6 +13,7 @@ from fastapi.responses import JSONResponse
 
 from database import close_db, init_db
 from routes.auth import router as auth_router
+from routes.credits import router as credits_router
 from routes.results import router as results_router
 from routes.scoring import router as scoring_router
 from schemas.common import ErrorBody, ErrorResponse
@@ -88,6 +89,7 @@ def create_app() -> FastAPI:
 
     app.include_router(scoring_router)
     app.include_router(auth_router)
+    app.include_router(credits_router)
     app.include_router(results_router)
     return app
 

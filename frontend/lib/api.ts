@@ -1,277 +1,162 @@
-const API_BASE_URL =
-  process.env.NEXT_PUBLIC_API_BASE_URL?.replace(/\/$/, "") ??
-  "http://localhost:8000";
+// API client for Aksesa backend
 
-export const SESSION_SCORING_RESULT_KEY = "aksesa_scoring_result";
-export const SESSION_AUTH_TOKEN_KEY = "aksesa_auth_token";
-export const AUTH_CHANGED_EVENT = "aksesa-auth-changed";
+const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000';
 
-type RequestOptions = Omit<RequestInit, "headers"> & {
-  token?: string;
-  headers?: Record<string, string>;
-};
-
-type ApiErrorShape = {
-  error?: {
-    code?: string;
-    message?: string;
-  };
-};
-
-export class ApiError extends Error {
-  code?: string;
-  status: number;
-
-  constructor(message: string, status: number, code?: string) {
-    super(message);
-    this.name = "ApiError";
-    this.code = code;
-    this.status = status;
-  }
-}
-
-async function requestJson<T>(
-  path: string,
-  { token, headers, ...options }: RequestOptions = {},
-): Promise<T> {
-  const response = await fetch(`${API_BASE_URL}${path}`, {
-    ...options,
-    headers: {
-      "Content-Type": "application/json",
-      ...(token ? { Authorization: `Bearer ${token}` } : {}),
-      ...(headers ?? {}),
-    },
-  });
-
-  let body: unknown = null;
-  try {
-    body = await response.json();
-  } catch {
-    body = null;
-  }
-
-  if (!response.ok) {
-    const parsed = body as ApiErrorShape | null;
-    const message =
-      parsed?.error?.message ?? "Terjadi kendala saat memproses permintaan.";
-    throw new ApiError(message, response.status, parsed?.error?.code);
-  }
-
-  return body as T;
-}
-
-export interface ScoringRequestPayload {
-  transactions: { date: string; amount: number }[];
-  tokopedia: number;
-  shopee: number;
-  businessAge: number;
-  employees: number;
-  location: string;
-}
-
-export interface ScoringResponsePayload {
-  score: number;
-  risk_category: string;
-  factors: string[];
-  recommendations: string[];
-}
-
-export interface LoanSimulationRequestPayload {
-  amount: number;
-  score: number;
-  tenor_months: number;
-}
-
-export interface LoanSimulationResponsePayload {
-  amount: number;
-  score: number;
-  tenor_months: number;
-  monthly_interest_rate: number;
-  estimated_monthly_payment: number;
-}
-
-export interface OcrResponsePayload {
-  file_name: string;
-  status: string;
-  extracted_text: string;
-}
-
-export interface LoginResponsePayload {
-  access_token: string;
-  token_type: string;
-  expires_in: number;
-  user: {
-    id: string;
-    email: string;
-    name: string;
-    role: string;
+export interface ApiError {
+  error: {
+    code: string;
+    message: string;
   };
 }
 
-export interface ResultCreatePayload {
-  score: number;
-  risk_category: string;
-  factors: string[];
-  recommendations: string[];
-  summary?: string;
-  metadata?: Record<string, unknown>;
+export interface CreditsBalance {
+  free_credits: number;
+  premium_credits: number;
+  total_credits: number;
+  subscription_tier: string;
+  is_premium: boolean;
+  last_reset: string | null;
+  next_reset: string | null;
 }
 
-export interface ResultResponsePayload {
+export interface CreditTransaction {
   id: string;
-  score: number;
-  risk_category: string;
-  factors: string[];
-  recommendations: string[];
-  summary: string | null;
-  metadata: Record<string, unknown>;
+  action: string;
+  credits_used: number;
+  credits_remaining: number;
+  description: string | null;
   created_at: string;
 }
 
-export interface ShareResultResponsePayload {
-  result_id: string;
-  share_url: string;
-  shared_at: string;
+export interface CreditsHistory {
+  transactions: CreditTransaction[];
+  total: number;
+  limit: number;
+  offset: number;
 }
 
-export interface ExportResultPdfResponsePayload {
-  result_id: string;
-  download_url: string;
-  generated_at: string;
-}
-
-export interface MeResponsePayload {
-  id: string;
-  email: string;
-  name: string;
-  role: string;
-}
-
-export async function uploadInvoiceForOcr(file: File): Promise<OcrResponsePayload> {
-  const formData = new FormData();
-  formData.append("file", file);
-
-  const response = await fetch(`${API_BASE_URL}/api/v1/documents/ocr`, {
-    method: "POST",
-    body: formData,
+/**
+ * Get user's credit balance
+ */
+export async function getCreditsBalance(token: string): Promise<CreditsBalance> {
+  const response = await fetch(`${API_BASE_URL}/api/v1/credits/balance`, {
+    method: 'GET',
+    headers: {
+      'Authorization': `Bearer ${token}`,
+      'Content-Type': 'application/json',
+    },
   });
-
-  let body: unknown = null;
-  try {
-    body = await response.json();
-  } catch {
-    body = null;
-  }
 
   if (!response.ok) {
-    const parsed = body as ApiErrorShape | null;
-    const message =
-      parsed?.error?.message ?? "Gagal memproses dokumen invoice.";
-    throw new ApiError(message, response.status, parsed?.error?.code);
+    const error: ApiError = await response.json();
+    throw new Error(error.error.message || 'Failed to fetch credits balance');
   }
 
-  return body as OcrResponsePayload;
+  return response.json();
 }
 
-export function submitScoring(
-  payload: ScoringRequestPayload,
-): Promise<ScoringResponsePayload> {
-  return requestJson<ScoringResponsePayload>("/api/v1/scoring", {
-    method: "POST",
-    body: JSON.stringify(payload),
-  });
+/**
+ * Get user's credit transaction history
+ */
+export async function getCreditsHistory(
+  token: string,
+  limit: number = 20,
+  offset: number = 0
+): Promise<CreditsHistory> {
+  const response = await fetch(
+    `${API_BASE_URL}/api/v1/credits/history?limit=${limit}&offset=${offset}`,
+    {
+      method: 'GET',
+      headers: {
+        'Authorization': `Bearer ${token}`,
+        'Content-Type': 'application/json',
+      },
+    }
+  );
+
+  if (!response.ok) {
+    const error: ApiError = await response.json();
+    throw new Error(error.error.message || 'Failed to fetch credits history');
+  }
+
+  return response.json();
 }
 
-export function login(
-  email: string,
-  password: string,
-): Promise<LoginResponsePayload> {
-  return requestJson<LoginResponsePayload>("/api/v1/auth/login", {
-    method: "POST",
+/**
+ * Upgrade user's subscription
+ */
+export async function upgradeSubscription(
+  token: string,
+  tier: string,
+  credits: number = 0
+): Promise<CreditsBalance> {
+  const response = await fetch(
+    `${API_BASE_URL}/api/v1/credits/upgrade?tier=${tier}&credits=${credits}`,
+    {
+      method: 'POST',
+      headers: {
+        'Authorization': `Bearer ${token}`,
+        'Content-Type': 'application/json',
+      },
+    }
+  );
+
+  if (!response.ok) {
+    const error: ApiError = await response.json();
+    throw new Error(error.error.message || 'Failed to upgrade subscription');
+  }
+
+  return response.json();
+}
+
+/**
+ * Login user
+ */
+export async function login(email: string, password: string): Promise<{ access_token: string; token_type: string; expires_in: number }> {
+  const response = await fetch(`${API_BASE_URL}/api/v1/auth/login`, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+    },
     body: JSON.stringify({ email, password }),
   });
+
+  if (!response.ok) {
+    const error: ApiError = await response.json();
+    throw new Error(error.error.message || 'Login failed');
+  }
+
+  return response.json();
 }
 
-export function loginWithGoogle(
-  credential: string,
-): Promise<LoginResponsePayload> {
-  return requestJson<LoginResponsePayload>("/api/v1/auth/google", {
-    method: "POST",
-    body: JSON.stringify({ credential }),
-  });
-}
-
-export interface RegisterPayload {
-  email: string;
-  password: string;
-  name: string;
-  business_name?: string;
-  phone?: string;
-}
-
-export function register(
-  payload: RegisterPayload,
-): Promise<LoginResponsePayload> {
-  return requestJson<LoginResponsePayload>("/api/v1/auth/register", {
-    method: "POST",
-    body: JSON.stringify(payload),
-  });
-}
-
-export function getMe(token: string): Promise<MeResponsePayload> {
-  return requestJson<MeResponsePayload>("/api/v1/auth/me", { token });
-}
-
-export function createResult(
-  payload: ResultCreatePayload,
-  token: string,
-): Promise<ResultResponsePayload> {
-  return requestJson<ResultResponsePayload>("/api/v1/results", {
-    method: "POST",
-    token,
-    body: JSON.stringify(payload),
-  });
-}
-
-export function getResult(
-  resultId: string,
-  token: string,
-): Promise<ResultResponsePayload> {
-  return requestJson<ResultResponsePayload>(`/api/v1/results/${resultId}`, {
-    token,
-  });
-}
-
-export function shareResult(
-  resultId: string,
-  token: string,
-): Promise<ShareResultResponsePayload> {
-  return requestJson<ShareResultResponsePayload>(
-    `/api/v1/results/${resultId}/share`,
-    {
-      method: "POST",
-      token,
+/**
+ * Register new user
+ */
+export async function register(
+  email: string,
+  password: string,
+  name: string,
+  businessName?: string,
+  phone?: string
+): Promise<{ access_token: string; token_type: string; expires_in: number }> {
+  const response = await fetch(`${API_BASE_URL}/api/v1/auth/register`, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
     },
-  );
-}
-
-export function exportResultPdf(
-  resultId: string,
-  token: string,
-): Promise<ExportResultPdfResponsePayload> {
-  return requestJson<ExportResultPdfResponsePayload>(
-    `/api/v1/results/${resultId}/export/pdf`,
-    {
-      token,
-    },
-  );
-}
-
-export function simulateLoan(
-  payload: LoanSimulationRequestPayload,
-): Promise<LoanSimulationResponsePayload> {
-  return requestJson<LoanSimulationResponsePayload>("/api/v1/simulation/loan", {
-    method: "POST",
-    body: JSON.stringify(payload),
+    body: JSON.stringify({
+      email,
+      password,
+      name,
+      business_name: businessName,
+      phone,
+    }),
   });
+
+  if (!response.ok) {
+    const error: ApiError = await response.json();
+    throw new Error(error.error.message || 'Registration failed');
+  }
+
+  return response.json();
 }

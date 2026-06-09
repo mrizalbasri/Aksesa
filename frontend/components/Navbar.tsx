@@ -4,6 +4,7 @@ import { motion } from "framer-motion";
 import { SESSION_AUTH_TOKEN_KEY, AUTH_CHANGED_EVENT, getMe } from "@/lib/api";
 import { Button } from "@/components/ui/button";
 import { useRouter } from "next/router";
+import { CreditsDisplay } from "./CreditsDisplay";
 
 const Navbar = () => {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
@@ -109,6 +110,15 @@ const Navbar = () => {
         >
           {isLoggedIn ? (
             <>
+              <motion.div
+                variants={{
+                  hidden: { opacity: 0, x: 20 },
+                  visible: { opacity: 1, x: 0 },
+                }}
+                transition={{ duration: 0.3 }}
+              >
+                <CreditsDisplay />
+              </motion.div>
               <motion.div
                 variants={{
                   hidden: { opacity: 0, x: 20 },

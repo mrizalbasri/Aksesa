@@ -37,6 +37,45 @@ DEMO_*.md
 **/DEVELOPMENT_PLAN.md
 **/BACKEND_TRUST_FIRST_API_PLAN.md
 **/PHASE_PLAN_FORMAT.md
+node_modules/
+.env
+.env.local
+*.pyc
+__pycache__/
+.pytest_cache/
+dist/
+build/
+*.egg-info/
+.DS_Store
+.vscode/
+.idea/
+*.log
+.next/
+out/
+.idea/
+*.swp
+*.swo
+*~
+.venv/
+venv/
+env/
+*.pkl
+*.joblib
+demo.md
+aksesa.db
+
+# 🚫 Internal working files - DO NOT PUSH
+# Agent configuration & skills (internal development infrastructure)
+.agents/
+
+# Planning & phase files (internal project management)
+PHASE_*_PLAN.md
+DEVELOPMENT_PLAN.md
+DEMO_*.md
+**/PHASE_*_PLAN.md
+**/DEVELOPMENT_PLAN.md
+**/BACKEND_TRUST_FIRST_API_PLAN.md
+**/PHASE_PLAN_FORMAT.md
 .DEMO_DEPLOYMENT_CHECKLIST.md
 DEMO_QUICK_START.md
 .azure/deployment-plan.md
@@ -48,3 +87,7 @@ docs/superpowers/
 AGENTS.md
 SUBMISSION_CHECKLIST.md
 DEPLOYMENT.md
+
+# MLflow local database & runs
+mlflow.db
+mlruns/

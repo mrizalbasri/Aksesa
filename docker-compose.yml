@@ -1,0 +1,102 @@
+services:
+
+  # ---------------------------------------------------------------------------
+  # FastAPI Backend Service
+  # ---------------------------------------------------------------------------
+  backend:
+    build:
+      context: ./backend
+      target: development
+    container_name: aksesa-backend
+    restart: unless-stopped
+    ports:
+      - "8000:8000"
+    environment:
+      - DEBUG=true
+      - SECRET_KEY=dev-aksesa-super-secret-key-2026-change-in-prod
+      - ACCESS_TOKEN_EXPIRE_MINUTES=60
+      - DATABASE_URL=sqlite+aiosqlite:////app/aksesa.db
+      - MLFLOW_TRACKING_URI=http://mlflow:5000
+    volumes:
+      - ./backend:/app
+    depends_on:
+      - mlflow
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8000/docs"]
+      interval: 10s
+      timeout: 5s
+      retries: 3
+    networks:
+      - aksesa-network
+
+  # ---------------------------------------------------------------------------
+  # Next.js Frontend Service
+  # ---------------------------------------------------------------------------
+  frontend:
+    build:
+      context: ./frontend
+      args:
+        NEXT_PUBLIC_API_BASE_URL: http://localhost:8000
+    container_name: aksesa-frontend
+    restart: unless-stopped
+    ports:
+      - "3000:3000"
+    environment:
+      - NODE_ENV=development
+      - NEXT_PUBLIC_API_BASE_URL=http://localhost:8000
+    volumes:
+      - ./frontend:/app
+      - /app/node_modules
+      - /app/.next
+    depends_on:
+      - backend
+    networks:
+      - aksesa-network
+
+  # ---------------------------------------------------------------------------
+  # MLflow Tracking Server (MLOps)
+  # ---------------------------------------------------------------------------
+  mlflow:
+    image: ghcr.io/mlflow/mlflow:v2.10.2
+    container_name: aksesa-mlflow
+    restart: unless-stopped
+    ports:
+      - "5000:5000"
+    command: >
+      mlflow server
+      --host 0.0.0.0
+      --port 5000
+      --backend-store-uri sqlite:////mlflow/mlflow.db
+      --default-artifact-root /mlflow/artifacts
+    volumes:
+      - mlflow_data:/mlflow
+    networks:
+      - aksesa-network
+
+  # ---------------------------------------------------------------------------
+  # PostgreSQL Database (Optional - Enable with: docker compose --profile prod up)
+  # ---------------------------------------------------------------------------
+  postgres:
+    image: postgres:16-alpine
+    container_name: aksesa-postgres
+    restart: unless-stopped
+    profiles:
+      - prod
+    ports:
+      - "5432:5432"
+    environment:
+      - POSTGRES_DB=aksesa
+      - POSTGRES_USER=aksesa
+      - POSTGRES_PASSWORD=aksesapassword
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    networks:
+      - aksesa-network
+
+networks:
+  aksesa-network:
+    driver: bridge
+
+volumes:
+  mlflow_data:
+  postgres_data:
